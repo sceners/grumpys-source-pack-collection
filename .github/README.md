@@ -1,8 +1,8 @@
-# Grumpys Source Pack Collection.
+# Grumpys source pack collection.
 
-#### Written in 1994 April.
+#### Written in 1994 April for MS-DOS.
 
-International Network Of Crackers (INC).
+Grumpy's source pack of International Network Of Crackers (INC).
 
 [Original package](https://defacto2.net/f/a41896f)
 
