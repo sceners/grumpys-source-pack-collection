@@ -1,0 +1,398 @@
+
+		Scream Tracker Music Interface Kit V0.2
+		
+			       S.T.M.I.K.
+		
+		  Copyright (C) 1991 Sami Tammilehto
+		  
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Contents:
+ 1. About the STMIK and this documentation
+ 2. License
+ 3. Future Crew demo included
+ 4. Scream Tracker V3.0
+ 5. STMIK module format
+ 6. How to make music for STMIK?
+ 7. Limits of the current STMIK
+ 8. How to use the STMIK
+ 9. Examples
+10. How to compile the examples
+11. The STMLOAD.OBJ
+12. Calling the STMLOAD.OBJ
+13. Notes on STMLOAD.OBJ
+14. The STMIK020.OBJ
+15. Calling the STMIK with Assembler
+16. Calling STMIK from C or Pascal
+17. Notes on STMIK
+18. Bugs?
+19. Quick function reference
+20. How to contact the author and get Scream Tracker related stuff
+21. Silicon Dragon information
+                  
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+1. About the STMIK and this documentation
+
+The current release of STMIK is a beta one (as the version
+number states).  I'm releasing this kit for several reasons
+before it's finished. First of all the final kit can't be ready
+before Scream Tracker 3.0 is, for they should naturally be
+compatible. Because the ST3.0 is late, and MANY have been asking
+about a kit such as this I've finally decided to make it
+available. Because the STMIK is a beta one, I strongly suggest
+(and demand :-) that you will not distribute STMIK modules
+(dealt with later).  This is because the STMIK uses special
+beta-3.0 modules, which differ from both of the current module
+format and from the final ST3.0 format. This documentation is
+probably far from being error-free and well-arranged for it's
+done in a hurry, but you should get along pretty easily though.
+You will get a lot of help from the source codes included.
+Try making changes and testing your ideas, that's the best 
+way to learn.
+
+
+2. License
+
+You are free to use the STMIK in your own programs if, and only if 
+the following requirements are met:
+
+o The program using STMIK is NOT commercial. Also Shareware is counted
+  as commercial software.
+  
+o It is mentioned in either the program itself or in its documentation
+  that the program in question uses the "STMIK02"
+  
+o STMIK itself is not modified in any way 
+
+You are free to use the Future Crew Demo routines in your own programs
+if, and only if the following requirements are met:
+
+o The program using the routines is NOT commerical. Also Shareware is counted
+  as commercial software.
+  
+o Credits are given to the Future Crew for the sourcecode used.
+  
+o The demo look/feel is NOT duplicated (for example only texts/gfx are 
+  changed)
+
+The STMIK itself has been released into the Public Domain so
+feel free to redistribute this package, but DO NOT CHANGE ITS
+CONTENTS. All the documentation and files must be in their
+original form. You may NOT add or remove any files!
+
+
+3. Future Crew demo included
+
+The STMIK includes a Future Crew Demo as an example on how to
+integrate Scream Tracker music into demos or other graphically
+intensive applications which require smooth operation. The
+SOURCE CODE for the demo is included in the package! The demo
+requires a VGA compatible graphics adapter. You are free to use
+the sourcecode in your own programs accoring to the license. You
+must not, however, use the demo itself. Practically this means
+that routines can be reused, but using the demo itself and
+adding/modifying routines to make the demo look/feel slightly
+different are prohibited. The FC doesn't want lamers to take
+advantage of this source code; it's intended for serious coders.
+
+
+4. Scream Tracker V3.0
+
+The ST3.0 should be finished during the summer '91, though it
+will probably be late as the past has shown. The playing
+routines included in the STMIK are from the current ST3.0 and
+they are debugged and tested, so they should be ok. (what's
+missing from the ST3.0 is proper editing functions and adlib
+support plus all kinds of minor niceties). It's not sure yet
+how the Scream Tracker V3.0 will be distributed, but all 
+registered users will get a special update offer.
+
+
+5. STMIK module format
+
+The STMIK uses a special beta-V3.0 module format. Due to the 
+module formats beta nature, the current STMIK uses a .STX 
+extension instead of the normal .STM. I'm not intending to do
+a STX->STM converter, so treat STX as the format to be
+used in finished programs, NOT as a format to be used in
+distributing modules. A program called STM2STX is included,
+and it'll convert STM modules to the STX format for usage
+in your own programs.
+
+
+6. How to make music for STMIK?
+
+You can make .STM files with the Scream Tracker, and then
+convert them to the .STX format for inclusion in your programs.
+See the STREG.DOC for information on how to register the 
+Scream Tracker. By doing so you'll be able to make your
+own custom musics to match your program! If you've never
+seen the Scream Tracker, try finding a demo version of
+the shareware program. See the end of the file for how
+to find ST and related utilities!
+
+
+7. Limits of the current STMIK
+
+The current STMIK is 'not as good' as the Scream Tracker for it
+supports less output devices etc. This due to the new routines
+used which aren't yet complete. The player supports ONLY 
+SoundBlaster, thought support for other cards will be added
+in the next STMIK's. The player should be 100% compatible with
+all the modules. In fact, the player supports several ProTracker
+commands the newest Scream Tracker yet does not. It is also 
+many times faster than the old ST. There are some incompabilities
+though; vibrato is divided like in new Amiga trackers. This
+means all vibratoeing will be only half as big as in old ST.
+Also some timing/sliding has been fine tuned to match
+Amiga exactly, so it differs a A LITTLE from the old ST, though
+generally you won't be able to know the difference.
+
+
+8. How to use the STMIK
+
+There are two object files in the STMIK. One of them is the actual
+player (STMIK020.OBJ) and the other one is a stm loader (STMLOAD.OBJ). 
+Both object files should be linked with your program. The can be
+called from either C or Assembly. Take a look at the make batch files
+MAKED.BAT and MAKEP.BAT to see how the linking is done. Remark that 
+ALL routines in the STMIK are in LARGE memory model. Calling them 
+from other memory models may crash the machine.
+
+
+9. Examples
+
+There are two examples distributed with the STMIK. The C example
+is a player routine PLAY.EXE (which is created from the file
+PLAY.C) which can play both .STM and .STX modules. The Assembler
+example is the Future Crew demo mentioned earlier. Both of 
+the programs use STMIK for sound. Feel free to enhance the PLAY.C
+and add features to it to suit your needs. Remember give me
+credits for the original source code though.
+
+
+10. How to compile the examples
+
+The Future Crew demo is all in assembler (MAIN.ASM,DEMO.ASM,
+GRAP.ASM, INIT.ASM, TEXT.ASM, and MISC.ASM), so you only need
+MASM or TASM and either LINK or TLINK. I have used TASM and
+LINK. (pretty weird combination?-) Actually only MAIN.ASM is
+compiled, the other ASM files are included into it.  The ASM
+file division is mainly used to divide the routines into
+separate categories. Anyway, you can compile the demo by running
+the MAKED.BAT NOTE that the Future Crew demo need a data file
+MENTAL.FC which contains graphics and sound data. The data file
+was created with many different tools, so you cannot modify it
+with the STMIK, but then again, you shouldn't either!  The
+PLAY (PLAY.C) is written with Microsoft C, and I haven't been able 
+to test it with Turbo C, but it might work. Feel free to experiment.
+You can compile the PLAY with a batch file MAKEP.BAT
+
+
+11. The STMLOAD.OBJ
+
+The STM loader is designed for people who wish to make STM players,
+a STM jukebox or something like that. Please not that the STMLOAD.OBJ
+is not as good as the STM2STX.EXE which will convert .STM modules to
+.STX modules, for it loads the STM directly to memory and converts
+it in a fly. As a result to the differencies in the formats, a module
+loaded with STMLOAD will take more memory (though not much) than a
+module converted and then loaded as an .STX. Also the STMLOAD creates
+multiple memory reservations for the module, and the to free the
+memory taken by the module, you must call STMLOAD's own routine designed
+for it. Thus you can only load one STM at a time. This is of course 
+a pretty serious limit, but if you are making a player etc. it
+shouldn't matter. For your own programs (games etc.) you should use
+preconverted STX modules which you can load to the memory as you
+wish.
+
+
+12. Calling the STMLOAD.OBJ
+
+The STM loader has two C functions you can call. The one that
+loads a module is: stmik_loadstm(filename) whose parameter is
+naturally the filename of the stm you wish to load. The other
+routine is stmik_freestm() which frees the memory taken by the 
+previously loaded stm. Both routines can naturally be called
+from assembler with standard C calling convention. See the 
+PLAY.C source file for examples. If you want to call the
+C routines from Assembly take a glance at your Assembler
+users guide (you have one, right?). Anyway, I don't think
+anyone is going to make a player with pure Assembler, so
+I hope you'll be happy with the C routines.
+
+
+13. Notes on STMLOAD.OBJ
+
+Do not attempt to free the memopy taken by the stmik_loadstm
+by normal means. This will corrupt memory. Also loading a
+module twice without freeing the first one will create problems.
+stmik_loadstm returns NULL if the module loading was failed.
+
+
+14. The STMIK020.OBJ
+
+This is the main player intended for games, demos etc. software
+using music. The player takes aproximately 30K of memory (and
+also 30K of space in the EXE file, but most of this space is
+pure zero, so using Microsoft EXEPACK or LZEXE or similar packer,
+the EXE size can be mad a lot smaller. The STMIK can be called
+from either C or Assembly in simple routines. It can probably
+also be called from Pascal, if you specify it's routines use
+the C calling convention. 
+
+
+15. Calling the STMIK with Assembler
+
+You must define an extern procedure in your Assembler source.
+This can be accomplished by placing the followin line in the
+beginning of your source file (take a look at the MAIN.ASM):
+	EXTRN	stmik_asm:far
+Inside your source code you can simply call STMIK in the
+following way:
+	mov	ax,<function number>
+	[mov function data to other registers]
+	call	stmik_asm
+See the Quick Reference chapter in the end for functions
+and their parameters.
+
+
+16. Calling STMIK from C or Pascal
+
+In Pascal you must remember to define the STMIK routines so that
+they use the C calling convention. (you can create a pascal
+header file by modifying the STMIK.H). In C you can simply
+include the STMIK.H to get function prototypes. The actual
+calling is done with C functions like stmik_playsong. See
+the Quick Reference chapter in the end for function names
+and their parameters.
+
+
+17. Notes on STMIK
+
+The STMIK takes a lot of interrupts to its control and
+reprograms the DMA controller. The stmik_stopsong frees
+all the resources the STMIK has taken (stmik_playsong
+recaptures them). You MUST not use or modify interrupts
+while in your program. If you need to have a timer interrupt,
+capture it BEFORE you initialize STMIK. Of course you can
+cheat the driver :-) (as Future Crew demo does) if you
+use the polling mode. In this case you FIRST initialize
+STMIK, then set polling mode, and then capture the
+ints to yourself, remark though that after you call
+stmik_stopsong, the interrupts will reset to the point
+they were before the STMIK was initialized. Generally
+feel free to experiment on 'illegal' stuff with the
+STMIK, but don't count your program will work with the
+future STMIK's if you do so.
+
+
+18. Bugs?
+
+Well, you'll probably find them - after all, this is 
+a beta version! In a beta-beta-version there was
+a pretty serious bug with the IRQ handling (the first
+MENTAL SURGERY released by the Future Crew had the
+problem, though a new fixed version is now available).
+Please report all bugs to the author to get 'em
+fixed in the future versions.
+
+
+19. Quick function reference
+
+***** STMLOAD.OBJ - STM loader - LARGE memory model *****
+char *module_loaded=stmik_loadstm(char *filename);
+void=stmik_freestm(void);
+	See the PLAY.C for examples on how this routine
+	is used.
+
+***** STMIK020.OBJ - STX player - LARGE memory model - *****
+(in assembler, BYTE or WORD is returned in AL/AX, POINTER or LONG in DX:AX)
+int status(0==ok)=stmik_init(int mode,int ioadd,int irq,int mixspd);
+ASSEMBLER: AX=0, BL=[mode], BH=[irq], CX=[ioadd], DX=[mixspd]
+	[mode] is always 1 (which stands for SoundBlaster)
+	[ioadd] is SoundBlasters I/O address (default is 0x220)
+	[irq] is SoundBlasters IRQ number (default is 0x7)
+	[mixspd] is the speed at which the music is mixed (in Hz).
+	16000 is good (same as 12Mhz in Scream Tracker), 20000
+	is maximum and very good while 10000 or so is not so
+	good. The lower the number, the less processor time
+	is taken. THIS ROUTINE MUST ONLY BE CALLED ONCE IN THE
+	BEGINNING OF THE PROGRAM!
+int status(0==ok)=stmik_playsong(char far *module);
+ASSEMBLER: AX=1, BX=segment to [module]
+	[module] is a pointer to a .STX loaded into memory
+	(the STX must be contiquous in memory) or a pointer
+	passed by stmik_loadstm. THE MODULE MUST BE IN A BEGINNING
+	OF A SEGMENT; THE OFFSET PART OF THE POINTER MUST BE ZERO!
+int status(0==ok)=stmik_stopsong(void);
+ASSEMBLER: AX=2
+	this routine needs no explanations I think
+int status(0==ok)=stmik_setpollmix(int flag);
+ASSEMBLER: AX=3, BX=[flag]
+	[flag], when 0 means that the STMIK will take care of playing
+	automaticly and steal processor time by the aid of the timer.
+	This is the default. When [flag] is 1, the user must GIVE 
+	stmik processing time. See the next routine.
+void stmik_poll(void);
+ASSEMBLER: AX=4
+	When pollmix[flag] is 1, the user must call the stmik_poll
+	AT LEAST 10 TIMES A SECOND. It's not important how often
+	the STMIK is called. You can call it when ever convenient,
+	even at irregular intervals, as long as you call it often
+	enoug. If you have too long spaces between calls, the sound
+	seems to repeat like a broken record :-)
+int songpos=int stmik_songpos(void);
+ASSEMBLER: AX=6
+	This routine returns the position the song currently is so
+	that the Order which is being played is (songpos mod 256)
+	and the Loop (how many times the music has been played) is
+	(songpos/256). Remark that the songpos returns values a bit
+	too early; practically the value returned by songpos is about
+	1/4 seconds before the music actually IS in the spot the songpos
+	said it would be! (things should never be too ease you know)
+char far *pointer=stmik_nequinfo(void);
+ASSEMBLER: AX=5
+	This routine returns a far [pointer] to a note equalizer info
+	struct. It's a bit complex to explain, so look at the demo
+	sourcecode to get a hang of it. The bars on the screen
+	bottom in the Future Crew demo are done with this routine!
+
+
+20. How to contact the author and get Scream Tracker related stuff
+
+You can either send me a letter, or call the Silicon Dragon BBS,
+which is the main source for all ST related stuff! If you call
+the Silicon Dragon, leave the messages to the Scream Tracker
+Echo area (which is also available in other BBS'es) for I'll
+get them from there faster! All comments and ideas are welcome! 
+Authors contact addresses:
+	By mail:		By modem:
+	Sami Tammilehto		Silicon Dragon, 24h
+	Korikatu 8		Phone: +358-(9)21-500318
+	SF-20780 Kaarina	Fidonet: 2:222/101
+	Finland			Username: SAMI TAMMILEHTO
+
+21. Silicon Dragon information
+
+You got these brilliant files from:
+Silicon Dragon CBCS 24H +358(9)21-500318
+
+Hardware: 386/25MHz
+          150MB + 113MB HD
+Software: VM386 (Great Multi-Tasking soft.)
+          Maximus 1.02 Enhanced (BBS)
+Location: Turku/SF (Finland)
+Home of ScreamTracker and other nice softwares!
+You can also contact FC from here.
+
+How 2 contact SysOp by network's
+
+FidoNet......: JANI LAAKSO @ 2:222/101 (Or 2:222/152)
+
+6-)NET.......: TRI/JANI LAAKSO
+
+InterNet.....: JANI.LAAKSO@f152.n222.z2.FIDONET.ORG
+
+UUCP (bang)..: ...!fuug!casino!222!152!JANI.LAAKSO

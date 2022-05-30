@@ -1,0 +1,63 @@
+FIRE Routines  
+
+- A collection of fire demos that have been released on the
+internet.  
+
+Collected by Kirk A. Baum
+
+History:
+These routines simulate a flame on the monitor.  
+The original post (as far as I know) was from a demo by
+Jare of VangeliSTeam.  It was a demo called firedemo.  The
+code for this is included.  Later Mark Mackey posted some code
+to do an effect similar to the one done at the end of the
+Inconexia demo by Iguana.  Marks code was done at a higher
+resolution than the demo and was done in pascal with inline
+assembly.  These routines worked great on my 486 but I wanted
+to run them on some slower PS2s.  It was so slow that I decided
+to see if I could speed things up. I took these routins, and
+converted them back to the original resolution (80x50). I used
+Borland C with inline assembly.  I also put the palette infomation
+right in the source code so I didn't have to have another external
+file hangin around.  This increased the speed of the computations 
+but the bottle neck was the screen update time.  I decided to make
+a modex version because you can write to all four planes with one
+write.  Since I was using a 4x4 square this was ideal.  I increased
+the video output by 4.  Then after all was said and done I put 
+together a version that was written all in C for those who shy
+away from assembly language.  You still have to get down and dirty,
+but still using C calls from a manual. Another version of the fire
+program appeared by Bernard Schmitz and Christopher Tumber.  This
+one was in yet a higher resolution and done in straight assembly.
+I thought that it would be nice to have them all in one place and
+zipped them together in this archive.
+
+The Files:
+
+The fire demo by Jare of VangeliSTeam
+fire.asm        - The assembly source code
+fire.exe        - turns your monitor into a nice and cozy fire place
+fire.nfo        - original info file from Jare
+
+Flames code by Mark Mackey
+flames.pas      - Pascal source with inline assembly
+flames.exe      - the executable
+flames.txt      - original info file from Mark
+flames5.map     - a file containing palette colors, read by flames.pas
+
+Flame_* code by Kirk Baum
+flame_ac.c      - This code uses all C and mode 13h
+flame_as.c      - C code with inline assembly language in mode 13h
+flame_mx.c      - C code with inline assembly language with modex
+flame_ac.exe    - executables for all three versions
+flame_as.exe
+flame_mx.exe
+
+Flame11 source by Bernard Schmitz and Christopher Tumber
+flame11.asm     - Assembly code, similar to fire demo, higher resolution
+flame11.exe     - The exe file of course.
+
+Have fun - learn,
+
+Kirk A. Baum
+kbaum@Novell.com

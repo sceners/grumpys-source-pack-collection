@@ -1,0 +1,95 @@
+The following file details any modifications to the source code since the
+initial release.
+
+      NR - No release
+
+Ä Version 1.00 ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ July  4, 1992 Ä
+    ş Initial release
+
+Ä Version 1.01 ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ NR Ä July 10, 1992 Ä
+    ş Added oscilloscope mode in sd_MusicInterrupt
+      - Only works in MCGA 320x200x256 mode 13h
+      - The oscilloscope mode adds over 700 bytes to resulting executable.
+      * Idea from Oscilloscope 1.04 by Ernst Teuling.
+
+Ä Version 1.02 ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ NR Ä July 11, 1992 Ä
+    ş Revised the keyboard interrupt routines in sd_KbdTask
+      - Added slow down code for it ( try taking it out :) )
+
+Ä Version 1.10 ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ July 27, 1992 Ä
+    ş Separated the Protracker playing source into separate modules not only
+      for ease of use, but for size...see below.
+
+    ş Built the Protracker command-line player...simply the smallest Protracker
+      player ever...and it could be even smaller if the module Header weren't
+      in the data segment!
+
+    ş Added ifdef checking for the oscilloscope mode.  If you want it on, then
+      you must add a /DOSC to the makefile.
+
+    ş Cut all internal speaker support.  This is for several reasons:
+        [1] It is the start of preparing PPS for DMA mode...the DACs will go
+            next.
+        [2] Who actually used it?
+        [3] The translation table didn't work all that great anyway...freed up
+            approximate 280 bytes in the entire module player.
+
+    ş Added auto-detect code for the Soundblaster.
+
+    ş Added documentation file MODFORM.TXT, detailing the Protracker module
+      file format.
+
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+³   Filename update for STDLIB:
+³     ENV     .ASM ÄÄ Will scan for a certain environment variable (i.e.
+³                     future directory string for SPPA).
+³     ITOA    .ASM ÄÄ Not used.  Integer to string conversion for STDLIB.LIB.
+³     MEM     .ASM ÄÄ Contains the very simplistic heap management routines.
+³
+³
+³   Filename update for PPS:
+³     PPS     .ASM ÄÄ The standard routines for either instrument playing or
+³                     module playing.
+³     PPS     .INC ÄÄ Contains the structures and globals for all of the PPS
+³                     library files.
+³     PPSDET  .ASM ÄÄ PPS Detection routines.
+³     PPSINS  .ASM ÄÄ The instrument playback setup and interrupt routines.
+³     PPSLOAD .ASM ÄÄ Module loading routines.
+³     PPSTRACK.ASM ÄÄ Protracker playback routines.
+³
+³
+³   Filename update for SPPA:
+³     ALTSCRN .ASM ÄÄ Used in SPPA for scrolling the module, etc.
+³     DISPLAY .ASM ÄÄ Contains all of SPPA's display routines.
+³     FILES   .ASM ÄÄ Reads in the mod file names from the disk.
+³     GLOBALS .INC ÄÄ Contains the globals for SPPA.
+³     KEYTASK .*   ÄÄ Contains the keyboard and mouse routines.
+³     SPP     .ASM ÄÄ SuperProPlay Advanced
+³
+³
+³   Filename update for PPSCMD:
+³     PPSCMD  .ASM ÄÄ The assembly command-line Protracker player.
+³
+³
+³   Filename update for Make Files:
+³     STDLIB  .MAK ÄÄ Makefile for STDLIB.
+³     PPS     .MAK ÄÄ Makefile for PPS.
+³     MAKEFILE.    ÄÄ Makefile for SPPA.
+³     CMD     .    ÄÄ Makefile for PPSCMD.
+³
+³
+³   Documentation:
+³     WHATS   .NEW ÄÄ This documentation.
+³     README  .DOC ÄÄ The general documentation.
+³     MODFORM .TXT ÄÄ Protracker module file format.
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+Below lists things that users have asked for:
+    ş Soundblaster Pro support.  Next release.
+    ş Adlib Gold support.  I need specs on this.
+    ş Pro Audio Spectrum support.  Next release.
+    ş Gravis Ultrasound support.  I need specs on this, too.
+
+    ş MED module support.  I just need to implement it.
+
+    ş Synthesized sound.  Uh...well, maybe.

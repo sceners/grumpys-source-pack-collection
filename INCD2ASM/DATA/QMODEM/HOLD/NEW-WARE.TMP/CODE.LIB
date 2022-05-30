@@ -1,0 +1,259 @@
+SetBlock        proc
+                mov     ah,4ah
+		int	21h
+                jc      SetBlockError
+                ret
+SetBlockError:
+                push    ax
+                mov     ax,0003h
+                int     10h
+                pop     ax
+
+                cmp     ax,7
+                jz      Set10
+		cmp	ax,8
+                jz      Set20
+                cmp     ax,9
+                jz      Set30
+                lea     dx,SetUnknown
+                jmp     short SetBlockPrint
+Set10:          lea     dx,SetError7
+                jmp     short SetBlockPrint
+Set20:          lea     dx,SetError8
+                jmp     short SetBlockPrint
+Set30:          lea     dx,SetError9
+
+SetBlockPrint:  mov     ah,9
+     		int	21h
+                mov     ax,4c00h
+                int     21h
+                endp
+
+Allocate        proc
+                mov     ah,48h
+		int	21h
+                jc      AllocateError
+                ret
+AllocateError:
+                push    ax
+                mov     ax,0003h
+                int     10h
+                pop     ax
+
+                cmp     ax,7
+                jz      Allo10
+		cmp	ax,8
+                jz      Allo20
+                lea     dx,SetUnknown
+                jmp     short AllocatePrint
+Allo10:         lea     dx,SetError7
+                jmp     short AllocatePrint
+Allo20:         lea     dx,SetError8
+
+AllocatePrint:  mov     ah,9
+     		int	21h
+                mov     ax,4c00h
+                int     21h
+                endp
+
+DeAllocate      proc
+                mov     ah,49h
+		int	21h
+                jc      DeAlloError
+                ret
+DeAlloError:
+                push    ax
+                mov     ax,0003h
+                int     10h
+                pop     ax
+
+                cmp     ax,7
+                jz      DeA10
+                cmp     ax,9
+                jz      DeA20
+                lea     dx,SetUnknown
+                jmp     short DeAlloPrint
+DeA10:          lea     dx,SetError7
+                jmp     short DeAlloPrint
+DeA20:          lea     dx,SetError9
+
+DeAlloPrint:    mov     ah,9
+     		int	21h
+                mov     ax,4c00h
+                int     21h
+                endp
+
+
+Depack:         PUSH    AX
+                MOV     AX,BP
+                AND     AX,7
+                SHR     BP,1
+                SHR     BP,1
+                SHR     BP,1
+                CMP     AX,0
+                JE      ax_0
+                MOV     AX,1
+ax_0:           ADD     BP,AX
+                SHR     BX,1
+                SHR     BX,1
+                SHR     BX,1
+                POP     AX
+                push    cx
+                mov     cl,al
+                mov     al,1
+                shl     al,cl
+                MOV     AH,AL
+                NOT     AH
+                pop     cx
+Depackl1:       PUSH    CX
+                PUSH    AX
+                MOV     CX,DX
+Planes:         PUSH    CX
+                PUSH    DI
+                PUSH    BP
+NotherOne:      XOR     CX,CX
+                MOV     CL,DS:[SI]
+                INC     SI
+                CMP     CL,127
+                JA      CrunchyNut
+                INC     CX
+                SUB     BP,CX
+                push    bx
+PutByte:        mov     bl,ds:[si]
+                inc     si
+                push    cx
+                mov     cx,8
+orpixel:        rcl     bl,1
+                jc      carry_set
+                and     es:[di],ah
+                jmp     set_done
+carry_set:      or      es:[di],al
+set_done:       inc     di
+                loop    orpixel
+                pop     cx
+                LOOP    PutByte
+                pop     bx
+                JMP     LineOk
+CrunchyNut:     SUB     CX,257
+                NEG     CX
+                SUB     BP,CX
+                push    bx
+                mov     bl,ds:[si]
+                mov     bh,bl
+                inc     si
+PutByte2:       push    cx
+                mov     cx,8
+orpixel2:       rcl     bl,1
+                jc      carry_set2
+                and     es:[di],ah
+                jmp     set_done2
+carry_set2:     or      es:[di],al
+set_done2:      inc     di
+                loop    orpixel2
+                mov     bl,bh
+                pop     cx
+                LOOP    PutByte2
+                pop     bx
+LineOk:         CMP     BP,0
+                JNE     NotherOne
+                POP     BP
+                POP     DI
+                POP     CX
+                SHL     AL,1
+                STC
+                RCL     AH,1
+                LOOP    Planes
+                push    bp
+                push    bx
+                shl     bp,1
+                shl     bp,1
+                shl     bp,1
+                shl     bx,1
+                shl     bx,1
+                shl     bx,1
+                ADD     DI,BP
+                ADD     DI,BX
+                pop     bx
+                pop     bp
+                POP     AX
+                POP     CX
+                LOOP    XDepackl1
+                RET
+
+XDepackl1:      jmp     Depackl1
+
+waitraster:     mov     dx,3dah
+ras1:           in      al,dx
+                test    al,8
+                jnz     ras1
+ras2:           cli
+                in      al,dx
+                test    al,8
+                jz      ras2
+                sti
+                ret
+
+Toogle:         mov     dx,3c4h
+                mov     al,1
+                out     dx,al
+                inc     dx
+                in      al,dx
+                xor     al,00100000b
+                out     dx,al
+                ret
+
+
+_ES16            dw      0
+_BX16            dw      0
+_ES9             dw      0
+_BX9             dw      0
+
+SetNewVectors:
+                push    cs
+                pop     ds
+
+                mov     ax,3516h           ;Get int vector
+                int     21h
+                mov     _ES16,es
+                mov     _BX16,bx
+
+                mov     ax,3509h           ;Get int vector
+                int     21h
+                mov     _ES9,es
+                mov     _BX9,bx
+
+                mov     ax,2516h           ;Set int vector
+                lea     dx,NewInt16
+                int     21h
+
+                mov     ax,2509h           ;Set int vector
+                lea     dx,NewInt9
+                int     21h
+                ret
+
+RestoreVectors: push    cs
+                pop     ds
+
+                mov     ax,2516h
+                mov     dx,_BX16
+                mov     ds,_ES16
+                int     21h
+
+                push    cs
+                pop     ds
+
+                mov     ax,2509h
+                mov     dx,_BX9
+                mov     ds,_ES9
+                int     21h
+                ret
+
+NewInt9:        push    ax
+                mov     al,20h
+                out     20h,al
+                pop     ax
+NewInt16:       iret
+
+
+
+

@@ -1,0 +1,42 @@
+From: John Paul Cloninger <clonij@rpi.edu>
+Date: Fri, 9 Apr 93 02:10:42 -0400
+
+Files:
+	PIC1.c, PIC2.c: are include files.  They are the picture in two gigantic
+arrays.  (Translated from a Pascal screen capture program - otherwise I would
+have made it one big one!)
+	WORMHOL6.c produces the screen image that is "cycled" Imagine a
+checkerboard as follows:
+
+		1  2  3  4
+		5  6  7  8
+		9  10 11 12
+		13 14 15 16
+
+What happens is that whatever colors are in positions 1,5,9,&13 are stored.
+2-4,6-8,10-12,14-16 are shifted over, then 1,5,9,&13 are put on the right.
+The new thing would look like this:
+		2  3  4  1
+		6  7  8  5
+		10 11 12 9
+		14 15 16 13
+Then it's shifted down:
+		6  7  8  5
+		10 11 12 9
+		14 15 16 13
+		2  3  4  1
+if you repeat this it looks like a moving checkerboard.  Change that into a 3d
+picture where colors are placed appropriately, and you have a wormhole.
+	
+	WORMIT3.c does the cycling.  It's not really cycling though.  The 
+transformations above are actually done in this program.  The color numbers
+are not changed, simply the color positions in the palette.
+	
+	Anyway, you'll need Turbo C++ and TASM to run them - they use assembly
+language plot routines a friend of mine wrote.  In places the code is absolutely
+ugly, in such a way that no one else could understand it.  Hopefully you won't
+have too many problems.
+			
+						John Cloninger
+						IND Coder
+

@@ -1,0 +1,64 @@
+  First of all. If you had PMODE v1.29a, you might have noticed there were a
+few typos in the doc and example programs. It also didn't seem to want to
+compile with TASM 3.2 (been fixed here (I hope (I don't have 3.2))). So if
+you've had a bad experience with 1.29a, try this, it might work... or not...
+
+  This is the PMODE protected mode code raw, XMS, VCPI, and DPMI compliant
+header thingy. The files are:
+
+  STUFF.DOC       - this annoying doc
+  PMODE.ASM       - the actual protected mode header
+  PMODE.INC       - externs for PMODE.ASM defined
+  PMODE.DOC       - instructions on PMODE.ASM
+  FILE.ASM        - just a quickie file library
+  FILE.INC        - all externs for file library
+  EXAMPLE.ASM     - protected mode example program
+  MAKEEX.BAT      - this batch file will make the example program. PMODE
+                    was coded under TASM 3.0. Just thought I'd tellya if you
+                    have a different compiler and it doesn't compile it.
+
+  PMODE.DOC only explains coding with PMODE.ASM. Read that, then get back here
+and you will understand the explanation for FILE.ASM that follows.
+(Its just an old lib that I quickly fixed up a little and included)
+
+------------------------------------------------------------------------------
+FILE:
+-----
+
+  This is a basic library of some file functions. They are:
+
+    _openfile   - I think this is self-explanatory.
+    _readfile   - ditto.
+    _writefile  - gee... what could this possibly be???
+    _createfile - I don't know...
+    _deletefile - summons the devil...
+    _findfile   - ok, this one is the same as DOS int 21h functions 4eh, and
+                  4fh (AL specifies which one upon entry).
+    _lseekfile  - same as int 21h function 42h.
+    _filesize   - returns the size of and opened file.
+    _filecopy   - copies ECX bytes from one open file to another.
+    _closefile  - guess...
+
+  To get a slightly better description of these functions, check out FILE.ASM
+itself.
+
+  Most of the functions will work immediately, without any setting up of
+anything by your program. However ... If you wish to read or write to a memory
+address that is above 1M, you will have to set up an intermediate file buffer
+somewhere below 1M for FILE to use (Remember, plain DOS can't talk to memory
+above 1M)... Also, '_filecopy' always requires this buffer. But this is no
+problem, setting up this buffer is easy. There are two variables that specify
+the location and size of this buffer. '_filebufloc' is a pointer to the buffer
+area somewhere in low memory. Your program must initialize this pointer, but
+you may modify it to point to a default area within your code. '_filebuflen'
+is the length of this buffer. 4000h bytes by default, but you may change it at
+compile time and run time.
+
+  One thing to note. At the top of FILE.ASM, there are several lines commented
+out. If you wish to use a function other than '_closefile', you must uncomment
+that file's token string in FILE before compiling it. This is merely because
+I don't like to waste code space, and include only what has to be included.
+If you don't want to bother, simply uncomment all these lines, and leave it
+like that, and all these functions be available without you having to edit
+FILE.ASM every time you want to use it.
+

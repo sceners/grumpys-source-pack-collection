@@ -1,0 +1,21 @@
+From: jas37876@uxa.cso.uiuc.edu (John A. Slagel)
+Subject: Scaling routines...
+Date: Tue, 27 Apr 1993 02:28:55 GMT
+
+    As promised, here are some routines to do bitmap scaling in
+    modeX and mode13h.  I made them pretty flexible, so if you
+    hard-wire in some of the parameters, you could get a bit of
+    a speed up.  The mode13h one can be used in system memory
+    pretty easily, and the modeX draws by columns instead of
+    rows to reduce the number of plane changes...  
+
+    Please, if you are maintaining a pub domain library, like
+    XLIB or Yakicons, feel free to put these routines in there.
+
+    I will post them in two posts, XSCALE1 and SCALE1. Enjoy.
+    Any questions or optimizations or comments are appreciated
+    until May 14th, when I loose my Internet access.
+
+-- 
+ John A. Slagel
+ j-slagel1@uiuc.edu

@@ -1,0 +1,131 @@
+
+  Lots of potentially useless stuff in this release... Scrollers and fonts.
+
+
+  The concept behind the scrollers (HSCR*.ASM) is the same as the credits
+  scroller. Except sideways. Just make the virtual width slightly greater
+  than twice the actual screen width so you don't have to time anything. 
+  
+  Update at the right edge of the screen and at the right edge + SCRW/2.
+
+  Pan to the rigth and when you hit an offset of SCRW/2 or greater,
+  subtract SCRW/2 from it. And continue.  It's really quite simple, if 
+  you know your planar modes...
+
+  INCLUDED IN THIS ZIP SHOULD BE:
+
+    HSCR*.ASM   ;the source to many variations of a scroller
+    HSCR*.EXE   ;executables for those with MASM (get TASM!)
+
+    font5.VCH   ;the blue font
+    font5.PAL   ;the palette that make the font blue
+    font5.TGA   ;the file used to clip the blue font from
+
+    *.VCH       ;other fonts
+    *.PAL       ;other pals
+
+    GCX.*       ;"Get Characters in mode X"
+                ; lets you clip out the characters in a cool way
+
+    VCHED.*     ;"VCH EDITOR"
+                ; lets you edit the characters once you have grabbed 'em
+
+    GETPAL.*    ;Takes the palette out of a TGA file and saves it in a
+                ; PAL file
+
+    VCH2FNT.*   ;Converts an 8 wide VCH font to a text mode font (.fnt)
+
+    DoFont.*    ;dumps a .FNT file onto the VGA card and changes the font
+
+
+    And maybe some others that I forgot to mention...
+
+
+
+  How to use GCX:
+
+    1) Make your font in your favorite picture editor (I use DP)
+    2) Convert the picture to the uncompressed TGA format with GWS
+    3) type "GCX FontName"
+    
+    On the dimensioning screen:
+
+       * Arrow keys adjust the dimensions
+       * + and - keys change the number of characters
+       * F and f changes the starting character
+       * Hit enter to accept choices
+
+     NOTE: Because I'm lazy, I did not add the feature of a safe resizing,
+           so if you resize after grabbing some characters, you'll have to        
+           re grab them.
+
+     On the grabbing screen:
+
+        * Arrow keys move cross hairs around
+        * CTRL + Arrow keys move by the width or height of the font
+        * CTRL G grabs the selected image
+        * + and - changes the current character
+        * CTRL S saves the font
+        * Page up and Page down make the split screen move!
+        * CTRL Q quits quite unsafely (laziness)
+
+  And now VCHED:
+
+    1) Be sure to run GETPAL on the TGA file before running VCHED, or it'll
+       complain.
+    2) This only edits an existing VCH file, so you must run GCX first.
+
+    The Keys:
+
+        CTRL-F1     Save font (don't ask why I used CTRL-F1, I don't know.)
+        CTRL-F2     Erase current character
+
+        F1          Copy
+        F2          Paste
+
+        F3          Roll left
+        F4          Roll right
+        F5          Roll up
+        F6          Roll down
+
+        F7          Flip
+        F8          Mirror
+
+        F9          Grab color under cursor
+        F10         Restore character to what it was when loaded
+
+        + and -     Change character you are working on
+
+        Arrow Keys  Move cursor
+
+        Left shift  Draw FG color
+        Right shift Draw BG color
+
+        [           Inc FG color
+        ]           Dec FG color
+        CTRL [      Inc BG color
+        CTRL ]      Dec BG color
+
+        CTRL Q      Quit
+
+        1 and 2     Inc / Dec scroller speed
+        3 and 4     Inc / Dec 'width' of character
+
+      And I think that's all the keys...
+
+
+    And now the VCH format:
+
+    BYTE        LENGTH      Description
+
+    0           5           "VLACH" -   kind of an identifier
+    5           1           What character is 0 (usually space - 20h)
+    6           1           Width of all the characters (X)
+    7           1           Height of all the characters (Y)
+    8           1           Number of characters (NumChar)
+
+    9           X*Y*NumChar The font data
+
+  9+X*Y*NumChar NumChar     The 'width' of each character
+
+

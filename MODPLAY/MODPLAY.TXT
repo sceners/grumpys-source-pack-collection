@@ -1,0 +1,19 @@
+
+    Well, here's my little mod player.. It does all the common protracker 
+commands.  (all of 'em that the MODs I have used.)  Take it for a whirl.
+Don't be too skeptical, though.  It was written for the SoundBlaster, so it's
+not stereo.
+
+  After you run it, it should do 1 of two things.
+
+    1) print out the BLASTER= environment thingy & wait for keypress
+
+    2) or it will prompt you for the IRQ/base address
+
+
+  If your BLASTER= thingy is in your enviromnet (SET BLASTER=... is in your
+autoexec.bat) then it should find it and print out the string.  And then
+you hit a key and it begins playing.  Enjoy.
+
+
+  -Draeden

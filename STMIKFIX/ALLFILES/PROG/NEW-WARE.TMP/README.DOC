@@ -1,0 +1,6 @@
+ Scream Tracker Music Interface Kit Version 0.2 - converter fix
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The original STMIK contained a converter (STM2STX.EXE) which didn't 
+quite work. Here is a fixed version of the converter (V1.1).
+

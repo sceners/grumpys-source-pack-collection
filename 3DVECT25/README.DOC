@@ -1,0 +1,258 @@
+
+                          3d Vectors Source 2.5
+
+   Date of release - sept 6/93
+
+   Written by: John McCarthy
+               1316 Redwood Lane
+               Pickering, Ontario.
+               Canada, Earth, Milky Way
+               L1X 1C5
+
+   Home phone, (416) 831-1944, don't call at 2 am eh!
+
+   Ok, lets make this quick...
+
+   Routines to be used by all for anything, just send me  a  copy  of  what
+   you've accomlished (final product) - or at least send me a postcard from
+   someplace near where you live.
+
+   Many thanks to: Razor - for providing source for their demo.  This  gave
+                   me the idea of how to draw polygons in the first place.
+
+                   Mode X routines - Matt Pritchard
+
+                   Protected Mode Header - Tran
+
+                   Bitmap X-mode Scaling routine - John A. Slagel
+
+                   Technical support - Robin Ward
+                                       Danny Hawrysio
+                                       Robert Johnson
+                                       Ciaran Gultniers
+                                       Mark Rostek
+                                       Sebastian Dwornik
+                                       Adam Kurzawa
+
+                   Food provided by - My Mommy
+
+  As noted above, this file would not  be  possible  without  other  people
+  giving away their source code.  I continue the tradition of "knowledge is
+  power" and give this away.  Most people who see this will never do a damn
+  thing with it but look at it and say "uh, so, what next?" so I don't want
+  you to register or anything dumb like that.  By the way, people who  want
+  money for crappy shareware progs can rot in hell.  But if you do  make  a
+  commercial game, and make billions, at least  send  me  a  postcard  from
+  the Bahamas ok!  Like I'm not going  to   refuse  a  cheque if  you  make
+  something commercial, but like I said, only 1 in a million  may  actually
+  have the time/effort/patience/guts/brains to make a commercial game.
+
+  The original Mode X routines have been  modified   to  support  protected
+  mode.  Many thanks Matt Pritchard for the X-Mode knowledge.  I  hope  you
+  don't mind my changing your routines.  Matt Pritchard can be  reached  at
+  P.O. Box 140264, Irving, TX  75014  USA.
+
+  The protected mode header has been supplied by TRAN and can be reached on
+  Sound Barrier BBS (718)979-6629.  I have included all of TRANs  protected
+  mode package because I really hate getting code from  someplace  and  not
+  getting the support for it.  I make no claim  to  any  of  this  code,  I
+  simply want to supply you with all the info to effectively work with this
+  3d vector package.
+
+  The bitmap scale routine has been supplied by John A. Slagel.  Thanks  to
+  you as  well  where  ever  you  are.   The  scale  routine  now  supports
+  transparent bitmapping.  As of this writing, John  A.  Slagel's  internet
+  access has been canceled and I have no other address for him.
+
+  If you want the original non-protected mode Vector  routines, I  can  dig
+  them up for you if you send me a  disk  or  something.   But  first,  ask
+  yourself, "Why would anyone want to  go back to  segmented  coding?"   If
+  you still want those  routines, hit  self  on  head  with  nearest  blunt
+  object and re-ask question.  (Many thanks TRAN)
+
+  Routines are heavily optimized for 3d  vectors.   Any  code/routine  that
+  slow is not intended to be used with animation and has  been  written  to
+  simply get the job done.  You will know which routines are slow/fast once
+  you look at the code.
+
+  I don't apologize for the lack  of  effective  documentation  or  example
+  programs as this code was written for my own use.  I would like to  spend
+  more time writing code than writing docs.  I also don't apologize for the
+  lack of universality of code execution.  For example, Matts xmode code is
+  callable from C but mine isn't.  Some of the routines must have registers
+  set up before entry and some require memory to be set up.  U figure which
+  is which.  It usually says at the begining of the routine.   Once  again,
+  making  everything callable from C slows things down  and  this is what I
+  wanted to avoid.  Speed is the key considering it is for my own use.
+
+  You must have a 386 to run this.  If you only have a 286, get a  job  and
+  buy a real machine!
+
+  Also, I really hate people who give away their "source" code but actually
+  only give away the object file.  If these people are so embarassed  about
+  their crappy code then we don't want your crappy object file.  Give  away
+  all or nothing.
+
+  It would be really nice if I got a postcard from some place near where you
+  live.
+
+    Some files in this zip:
+
+      main.asm      ; example program to show vectors
+      3d1.asm       ; 3d vector routines by John McCarthy, fast sort method
+      3d2.asm       ; 3d vector routines by John McCarthy, full sort method
+      xmode.asm     ; xmode routines by Matt Pritchard
+      xmouse.asm    ; xmode/protected mode mouse routines
+      pmode.asm     ; protected mode routines by TRAN
+      file.asm      ; pmode file routines by TRAN
+
+      xmode.inc     ; files defining externals for linkage
+      xmouse.inc    ; with above asm files
+      pmode.inc
+      3d.inc
+      file.inc
+
+      xscale.inc    ; bitmap scaling routines
+      math.inc      ; math functions for 3d.asm
+      sin.inc       ; data tables for math functions: math.inc
+      arctan.inc    ; inverse tan function tables: math.inc
+      vars1/2.inc   ; variables for 3d.asm routine
+      equ.inc       ; list of constants
+
+      macros.inc    ; macros used throughout
+
+      qb.zip        ; qb quickbasic programs to generate sin and arctan tables
+      modex104.zip  ; (some of the) original files from Matt's modex104.zip
+
+  Some bugs fixed for 2.1:
+
+    Mouse routine draw_bitmap fixed (start of bitmap is x and y). Fixes crash
+
+    Also, the mouse resolution has been divided by two to stop that dang  two
+    pixel movement!
+
+    Many bugs fixed in Xmode.asm conversion from segmented mode to protected
+    mode.  Too many protected mode bug fixes to list.
+
+    Also added some palette fading routines to xmode.asm
+
+    The big change is the new method of  sorting  surfaces.   Before,  objects
+    were sorted first, then surfaces within objects were sorted.  Now, drawing
+    an object simply draws the surfaces in   memory   and  then  ALL  surfaces
+    are sorted as a group.  This now allows small objects to go inside  larger
+    objects.  This is not possible in 3d1,  small objects will disappear.  The
+    3d1 file is faster but the 3d2 file has greater flexability with  objects.
+    The old file is 3d1.asm while the full sorting file  is  3d2.asm.  To  use
+    you must call sort_list and drawvect after makeobjs (if using  3d2  -  the
+    full sort method).  See main1 and main2 for examples.   To  give  you  the
+    speed difference between the two, the calculation for a   bubble  sort  is
+    (n^2+n)/2 for number of times routine will sort.  In 3d1 - 30 objects with
+    30 sides will take 465 sorts * 30 objects + 465 to sort those  objects  is
+    =  14,415  loops.   But  3d2  uses  the  basic  30*30  sorts.   Therefore,
+    (900^2+900)/2 = 405,450 loops!  You can use 3d2 in portions and still  get
+    the speed of 3d1 if you know certain objects will be far or near (eg  land
+    scapes and stars are always far) and this can provide you with  the  speed
+    and versatility of objects going inside one another.  The only  difference
+    between 3d1 and 3d2 is the sort method - full objects then surfaces (3d1),
+    or all surfaces together (3d2).
+
+    Also made it possible to now have points (single dots) and  bitmaps  as
+    part of an object.  You no longer need to make a bitmap it's own object
+    but can now have it as part of another object.  It is still possible to
+    have bitmaps as their own objects (for explosions and bullets).     See
+    sphered cube and regular sphere in example file.
+
+  Optimizations for 3dvect22:
+
+    Better make1obj routine  now  uses  ematrix  more  efficeintly  by  only
+    calculating matrix x,y and z as needed - makes better use  of  cpu  time
+    when there are many objects off screen (behind camera or too far lft/rgt
+    up/dwn)
+
+    Added more math functions
+
+    Optimized erotate when usez = no
+
+  Changes for 3dvect23:  Aug 10/93
+
+    Implemented new pmode.asm code by TRAN.  This replaces the  start32  code
+    and allows 3dvect to be run with memory managers like HIMEM  and  EMM386.
+    Many thanks to TRAN!  Note: Maximum speed is still found with  no  memory
+    managers - ei. raw memory.  Change all int 30h's to int 33h's.
+
+    Removed some common routines from 3d1 and 3d2 and put them in poly.inc to
+    avoid duplicate copies of routines.
+
+    Also added to xmode.asm routines to turn off the screen to stop flicker
+    when changing into xmode
+
+    Updated TGA2ICON program so it will function with the new pmode header
+    and can operate with those nasty memory managers.
+
+    I am currently writing this from my living room floor where I  have  been
+    laying for the last month due to a herniated disc in my lower back - fun!
+
+  Additions for 3dvect24:  Aug 29/93
+
+    The main addition for version 2.4 is the IRQ  routine  that  co-ordinates
+    itself  with  the  routine  updvectors.   The  IRQ  increments  the  byte
+    traces_past every time a vertical retrace occures  (regardless  of   what
+    the vector routines are doing) and the routine updvectors (get it, up the
+    vectors - d=the, like the poor people say) anyway, updvectors  uses  this
+    value to make the objects/animation "jump" ahead and  skip  frames.   the
+    slower the computer or the greater number of objects  there  are  on  the
+    screen, the higher the value  traces_past  will  be  after  updating  the
+    screen.  Therefore, if you write your own game/animation, use this  value
+    to determine how fast the game should go - the IRQ is timed to match  the
+    vertical retrace so every time one passes by, traces_past gets +1. I have
+    two interrupts - a protected mode IRQ and a real mode IRQ. I did it  this
+    way so that if you want to add music or whatever, you can use either type
+    of IRQ.  Both add 1 to traces_past.  Also, I have timed  the  IRQ  to  be
+    close to the vertical retrace time but I don't know if  I  have  done  it
+    correctly.  If you notice that the out dx,al is not the way to  go  about
+    it, drop me a line with the correct method of  setting  the  8253  timer.
+    The value of traces_past will be from 1 to whatever (never 0 after trace)
+
+    I also fixed a small bug in the updvectors routine - which is now  called
+    updvectors2, called by "updvectors".
+
+    I have also had a back operation to fix that herniated disc  and  am  now
+    sitting upright at my computer.  So I have this message for you:  Sit  up
+    straight at all occasions, bend from the knees, get two  people  to  lift
+    a heavy object, don't be macho,stand straight at all times,walk straight,
+    don't slouch when driving, don't over excercise, don't prop your head  up
+    with your arm when watching TV, (put adjective here) straight.  TAKE CARE
+    OF YOUR AMAZING MOTION MACHINE - YOUR BACK.   Learn  the  easy  way  from
+    someone who learnt the hard way - we're not invincible. STRAIGHT STRAIGHT
+    STRAIGHT! STRAIGHT! STRAIGHT! STRAIGHT! There, I'm done.
+
+  Some bugs fixed for 2.5:
+
+    Fixed the timer IRQ to have OUT 43h,AL (You'll never know the  difference
+    but I thought it would be a nice gesture)
+
+    I have also ripped a routine from someplace else  to  time  the  vertical
+    retrace and set the irq to this value.  This replaces the static variable
+    with a more accurate calculation for each computer's irq timing.
+
+    I also added a total retrace counter called "frame_number"  which  counts
+    from the begining of any animation so you can, let's say at  2.5  minutes
+    into it, perform a certain function.  The  counter  is  only  reset  when
+    reset_raster_count is called (begining of new animation sequence).
+
+    I have also changed the math routine setsincose so that if  you  are  not
+    using z rotations, you won't need to reset eyeaz to 0.  (Can be anything)
+    This really doesn't increase speed much though.
+
+    I optimized some of the imuls with a pre-calculated table. Just to remind
+    you:  Changing  video  modes  can occure within the program, but you  can
+    only change the vertical size, not the horizontal size (eg  swap  between
+    320x400 mode and 320x200 mode, or 360x480 mode   and  360x240  mode)  You
+    would only need to adjust the clipping limits and the make3d constants to
+    change modes while the program is  executing.   Re-assembley   would   be
+    required if you wanted to change into a different x-width mode.
+
+    Fixed the xmouse.asm routine plot_mouse.  It was  not  using  an  earlier
+    xmode bitmap change.
+
+

@@ -1,0 +1,13 @@
+You may use keys 0-6 in the 3D-demo to control rotation of the ship.
+
+0 - Stop rotation
+
+1 - Increase X-rotation
+2 - Increase Y-rotation
+3 - Increase Z-rotation
+
+4 - Decrease X-rotation
+5 - Decrease Y-rotation
+6 - Decrease Z-rotation
+
+

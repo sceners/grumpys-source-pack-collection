@@ -1,0 +1,116 @@
+
+                [ Lord Logics Fractal Landscape ]
+
+Type:   LL_FRAC /? for help
+
+What the heck, the source is included as well . . .
+
+Anyway, no  doc's here,  just a basic info file on this.  I wrote
+it mainly  for a  friend of  mine that  was doing a class project
+which entailed  entering  in  a  bunch  of  data  to  generate  a
+landscape for  placing a  house or  something.  Anyway, we didn't
+see a  need to enter in the data if we could have the computer do
+it, so I wrote this.
+
+It didn't  take me  long to  write, and if you look at the source
+code you  can see  that.   I was  actually amazed that it worked.
+Its not  very often  you can  say "hey, I think I'll write a such
+and such  program" and  then have  it working within two hours or
+so.   Well, this  one was  *almost* like that.  Took me about two
+hours to  get it "generally" working, but then I had to add a few
+features to make it more user-friendly.
+
+Basically, in  case you  were wondering, the way this works is as
+follows:
+
+Let's say you have the following points:
+
+
+          1             3          1
+
+
+
+          3             2          3
+
+
+
+
+          1             3          1
+
+
+Ok, first,  you take  the average  of all  points 1  and add some
+height variance  to it  to make  point 2.   You  then average the
+upper left heights and sub-divide all sides and the center in the
+same fashion.   Repeat  this a  certain number of iterations, and
+boom, you have a cool fractal landscape.
+
+From the side, after 5 iterations, one row may look like:
+              
+                            4 5
+                          5 | | 3
+                    4   2 | | | | 5
+                3 5 | 5 | | | | | | 4   1
+        1   4 5 | | | | | | | | | | | 5 |
+        | 5 | | | | | | | | | | | | | | |
+        | | | | | | | | | | | | | | | | |
+        1 5 4 5 3 5 4 5 2 5 4 5 3 5 4 5 1
+
+See, you take the height of the two 1's and average them then add 
+some variance to it and that will then give you  point  #2.   You 
+then (working to the left) take the left 1 and the 2, average 'em
+and add a variance.  That gives you point 3.  Average 1 and 3 and
+add the variance and that gives you 4.  4 and 1 average with  the
+variance makes 5.  You then do that for all  substeps,  and  then 
+you have a fractal mountain (sort of . . . actually, you  have  a
+line, but had you been doing it with four points, you would  have
+a fractal.  Almost . . .
+
+Fine, its a crappy example and you didn't learn anything from it.
+I don't really have much time to explain it.
+
+Anyway, the  guy I  wrote it for says the landscape load too slow
+for his  tastes.   I agree.  Unfortunately, I don't have the file
+structure for  the 3DS  format, so,  I had  to use  what I  could
+figure out.   If  you have the 3DS format, or any other graphical
+format that you want this to be coded to fit, email it to me (the
+description of the file format)  Email it with some money and  it
+will get done faster :)
+
+Basically, I  need to  know how  to define  vertices (points) and
+faces (triangles  that join  3 points  together) as  well as  any
+"header" information.  Then I just write a little new routine  or
+two to this, and *BOOM* a new version.
+
+If you want Rivers, Trees, Boulders, or anything like that added,
+you'll have to give me some money.  I really need money.
+
+Also, if  you know  where I  could find  the IPAS  toolkit for 3D
+Studio, I'd  be interested  in  porting  this  into  an  internal
+routine, although  I'm not  sure what  all that  entails.  I have
+read on  the network  that the  routines are public domain, so if
+you know  what FTP site they are on, PLEASE email me the info.  I
+am a  lowly college  sophomore and  don't have the $250 to get it
+from AutoDesk.
+
+Oh yeah,  this program LL_FRAC.EXE is public  domain/  shareware/
+freeware/ whatever  you want  to call it.  If you want to send me
+money, hey,  I'm game  :)   If you  want to give me a job for any
+reason, again, I'm game.
+
+Email me:  ketrenoj@ucs.orst.edu
+-or-
+If its  after June  1, 1993, email, ummm, peterl@hood.uofport.edu
+and ask  him to  forward the  message to me, and I'll get back to
+you.
+
+Money can be mailed to:
+                        James Ketrenos
+                        885 S.W. 84th Ct.
+                        Portland, OR 97225
+
+And 3D Studio and anything else I may have mentioned that is Copy-
+righted by someone else is Copyright by Autodesk or whoever it is 
+that owns the rights of the program I mentioned.  Clear?  Good.
+
+                         [ Lord Logics ]
+

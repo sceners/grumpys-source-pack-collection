@@ -1,0 +1,444 @@
+ÕÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¸
+³                  ÄÄÄÄÄÄÄÄÄÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÄÄÄÄÄÄÄÄÄÄ                   ³
+³     ÄÄÄÄÄÄÄÄÍÍÍÍÍÍÍÍÍÍÍ Extreme's SineCreator v1.00 ÍÍÍÍÍÍÍÍÍÍÍÍÄÄÄÄÄÄÄÄ     ³
+³                  ÄÄÄÄÄÄÄÄÄÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÄÄÄÄÄÄÄÄÄÄ                   ³
+ÆÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍµ
+³                               Coding: Zyric                                  ³
+³                             Graphics: Zyric                                  ³
+³                                 Idea: Zyric                                  ³
+³                           Bugtesting: Baldric & Vicious                      ³
+³                               Manual: Baldric                                ³
+ÔÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¾
+
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³                                   Index                                      ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+         1. Undo
+         2. Quit
+         3. Colour
+         4. Mouse
+         5. Shrink
+         6. Xcurve - Ycurve
+         7. Max X - Max Y
+         8. Help
+         9. File
+        10. Clear
+        11. Preview
+        12. About
+        13. CurveIcons
+        14. Copy
+        15. Cut
+        16. Paste
+        17. Jump
+        18. Mark
+        19. Insert On/Off
+        20. X Pos
+        21. Y Pos
+        22. DragBar
+        23. Cursor
+        24. Registration
+
+
+
+
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³                                   Undo                                     1 ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+        By pressing this button, the last major change will be undone.
+        And you can ofcourse undo the undo. i.e if you didn't mean to
+        undo you can always change your mind.
+
+        Hot-Key: U
+
+
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³                                   Quit                                     2 ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+        There are several different ways to quit.
+                1. Press the button with the mouse
+                2. Press with the mouse at the upper left part of the
+                   screen.
+                3. Press <ESC>, and confirming with <ENTER>
+                4. Press <ALT-X> to quit AND save last (check the
+                   section "FILE" for more info.
+
+
+        Hot-Keys: <ESC> to quit without saving last.
+                  <ALT-X> to quit and save last.
+
+
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³                                  Colour                                    3 ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+        The button labeled "Colour" brings you a pop-up window with nine
+        different color-setups. Choose the one that suits you. It'll be
+        saved in the config-file so you don't have to change colour
+        every time you enter the SineCreator.
+
+        Hot-Key: O
+
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³                                   Mouse                                    4 ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+        If you want to change the speed of the mousepointer, you can
+        press this button and choose one that you like.
+
+        Hot-Key: NONE
+
+
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³                                   Shrink                                   5 ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+        If you've made a curve and thinks it's too wide or too long, you
+        can change it by pressing "Shrink". You'll see a pop-up window
+        with some values. One of them, labeled "X" is the length of the
+        curve. The other labeled "Y" is the hight of it. Just change the
+        values to a percentage that you want. If there's no marked area,
+        the SHRINK will affect the whole curve. If insert is on and a
+        part of the curve is marked, the rest of the curve will move to
+        fit the "shrinked" curve.
+
+        Hot-Key: S
+
+
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³                               Xcurve-Ycurve                                6 ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+        This flips between the two curves. As you already have
+        understood, you can edit both X and Y curve at the same time.
+
+        Hot-Keys: <SPACE>
+
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³                               Max X - Max Y                                7 ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+        This is a bit difficult to explain, but once you know how it
+        works it's very simple. As you know, you can edit both X and Y
+        curves. You can see that both X and Y is edited at the same way.
+        That means: X is actually turned 90 degrees. (hard to
+        understand?) So if you want to see the X-curve as it gonna be in
+        your code, you have to look at the top of screen as the left
+        side of the screen. Once this is understood, the rest is quite
+        simple. When you change the values in Max - X, the *Witdh* of X
+        is changed, but you'll see it as Y changes due to the turned
+        screen. The Max - Y is easier, coz there you see the right
+        result directly. But why change the values? Well, if you code
+        something in f.ex 640*480, the screen in the SineCreator is too
+        small to display all of the curve. So set the Max - X to 640 and
+        Max - Y to 480 to see the curve as it'll be in your code. This
+        also affects the "PREVIEW" mode, descibed later.
+
+        Hot-Key: <F5> - Max X
+                 <F6> - Max Y
+
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³                                    Help                                    8 ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+        This is some on-line help. The functions aren't very well
+        described, but you probably can get something out of it anyway.
+
+        Hot-Key: H,<F1>
+
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³                                    File                                    9 ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+        When pressing "File", a new window will appear.
+
+                Path:   Press this button, and you're able to change the
+                        path. When you've written a path, press enter
+                        and then click outside the window to return.
+
+                Name:   Here you can write a name of the file to load or
+                        save.
+
+                Load:
+                        Load Last: Every time you press <ALT-X> or
+                                   save a file, another file called
+                                   "LAST.SC" is also saved. You can load
+                                   this one with "Load Last"
+                                   You can also load this by pressing
+                                   <ALT-L> in the mainscreen.
+
+                        Load File: This loads a file that is saved as
+                                   "Loadable" this is a fileformat you
+                                   cannot use in your own code, coz it's
+                                   in a special format, but useful if
+                                   you want to edit a file you didn't
+                                   like.
+
+                Save:   There are three different options you can use in
+                        conjuction with each other.
+
+                                1. Only X - saves only the X curve
+                                   Only Y - saves only the Y curve
+                                   X,Y Mixed - Saves BOTH X and Y like
+                                   this: "X,Y,X,Y,X,Y,X,Y..."
+
+                                2. Byte - limits the saved data to bytes.
+                                   Word - lets you save data in word.
+
+                                3. Raw - saves the data in ASCII-format
+                                   Asm - saves the data in plain digits;
+                                   f.ex: "db 1,2,4,6,9,14,16,18,19"
+
+                                There's a option that lets you change
+                                the length of the saved row when saving
+                                ASM. the default setting is 500. Press
+                                the button and change this to something
+                                else if you like.
+
+                                Theese settings are saved in the
+                                config-file.
+
+
+
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³                                   Clear                                   10 ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+        If you have a marked area and choose "CLEAR", only the marked
+        parts will be cleared. If INSERT is ON, the curve to the right
+        of the cleared part is moved, else there'll be an empty hole.
+        If there's no marked area, the whole curve will be deleted.
+
+        Hot-Key: C
+
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³                                  Preview                                  11 ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+        When you press this button, you'll see a new screen. This is the
+        2D part of the SineCreator. Here you see the two curves mixed
+        together. You probably will use this way in your code.
+        If you only have an X-curve or only an Y-curve, the screen in
+        preview will be blank. The "Max X" and "Max Y" settings in the
+        main-screen is here set to match the screen. f.ex if you set
+        "Max X" to 640 and "Max Y" to 480, the curve will be calculated
+        to fit the screen in 640 in X and 480 in Y.
+
+                ArrowKeyLeft:
+
+                        Pressing this arrow will make the crosshair move
+                        backwards in the curve.
+
+                ArrowKeyRight:
+
+                        This will move it forward.
+                Help:
+
+                        Brings you a help-screen.
+
+                Speed:
+                        Lets you change the speed of the crosshair,
+                        where "1" is the slowest and "9" is the fastest.
+                        This is saved in the config-file.
+
+                There's also a button here with some digits. It shows
+                you the position in the curve. You can edit this value
+                to see where a specific coord is.
+
+        Hot-Key: <F9>, P
+
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³                                   About                                   12 ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+        Check this out for some info about the SineCreator.
+
+        Hot-Key: A
+
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³                                 CurveIcons                                13 ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+        There are ten different curves you can use when making your
+        sinecurve. All of them is used in the same way. The easiest way
+        to understand them is to test! If Insert is on the curves after
+        the cursor will be moved forward. If insert is off, the new
+        curve overwrites the older one.
+
+        There are three different ways of making a curve.
+
+                1. Click on the desired curve an you'll see a pop-up
+                   window with some values you can edit:
+
+                        Pixels: this is the length of the curve.
+
+                        Ystart: where the curve starts
+
+                        Yend:   where the curve ends
+
+                   After pressing 'ok' you'll see the curve at the
+                   position of the cursor. If you've made a curve but doesn't
+                   like the result you can (without moving the cursor) just
+                   press the curve-icon again and get the same
+                   coordinates as before and then change them to new values.
+
+                2. Click on a curve with the right mousebutton and then click
+                   somewhere to the right of the cursor. This is the endpoint
+                   of the curve. You'll see the curve immediately.
+                   The curve starts at the cursor-position. This option
+                   is very useful if you doesn't want an exact curve,
+                   and/or you are in a hurry.
+
+                3. This is almost the same as way two except that you press
+                   the left mousebutton on the screen. This'll give you the
+                   window described in way one. This is useful if you want
+                   approximate curve but want to edit some values.
+                
+        Hot-Keys:  Way 1. 1-9
+                   Way 2. <SHIFT>1-9
+                   Way 3. <SHIFT>1-9
+
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³                                    Copy                                   14 ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+        Copies the marked area to a buffer.
+
+        Hot-Key: <ALT-C>,Grey +
+
+
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³                                    Cut                                    15 ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+        Cuts the marked area to a buffer
+        If INSERT is ON, the curve to the right of the cutted part is moved,
+        else there'll be an empty hole.
+
+        Hot-Key: <SHIFT-DEL>,Grey -
+
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³                                   Paste                                   16 ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+        Pastes the buffer to the position of the cursor.
+        If INSERT is ON, the curve to the right of the pasted part is moved
+        forward, else the buffer will write over the curve.
+
+        Hot-Key: <ALT-P>, Grey *
+
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³                                    Jump                                   17 ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+        Press this and the cursor will move to the end of the last
+        edited curve. Use this together with Way 3 when making a curve
+        to create a curve real fast!
+
+        Hot-Key: <TAB>
+
+
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³                                    Mark                                   18 ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+        There are two ways in marking a curve:
+
+                1. If you want to mark an area not bigger than the
+                   screen, just press the right mousebutton and drag it to
+                   the desired endpoint.
+
+                2. If you want to mark an area bigger than the screen,
+                   press the button labeled "MARK" and follow the
+                   instructions.
+
+        Hot-Key: M
+
+
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³                                Insert On/Off                              19 ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+        This will affect some functions already described. Generally
+        "Insert off" means a write over mode and "Insert on" means an
+        insertion mode.
+
+        Hot-Key: <INS>
+
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³                                    X Pos                                  20 ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+        This is where the the cursor is. If you place the cursor at the
+        end of the curve the digit shows you the length of the curve.
+        You can edit the value by pressing at the digits.
+
+        Hot-Key: NONE
+
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³                                    Y Pos                                  21 ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+        This is located in the lower-right part of the screen. It's the
+        position where a pixel is located. You can change the value by
+        pressing the very same button.
+
+        Hot-Key: NONE
+
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³                                   DragBar                                 22 ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+        This is the long bar in the middle of the lower part of the
+        screen. You can drag it to any position in the curve fast. Using
+        the arrows beside the dragbar will also change position. Only
+        pressing the left mousebutton will be a bit slower than pressing
+        both.
+
+        Hot-Keys:
+                LeftArrow:  <DEL>
+                RightArrow: <PGDN>
+
+
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³                                   Cursor                                  23 ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+        This is the vertical line in the mainscreen. By pressing the left
+        mousebutton you can move it in the curve. Where it points is the
+        start of next new curve. You can scroll the window by dragging
+        the bar to the right (or left) side of the screen.
+
+        Hot-Key: Left and Right Arrow-keys
+
+
+
+
+
+
+
+
+ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+³                              Registration                                 24 ³
+ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+To register, send an envelop containing 15$ (or 100sek) to:
+
+        David Broman
+        Hagafors
+        560 13 Hok
+        Sweden
+
+Include these information about yourself, or else you won't get any
+answer:
+
+      *  Real name (both first and family name)
+      *  Address
+      *  Phone Number
+      *  15$ (or 100sek)
+
+
+
+

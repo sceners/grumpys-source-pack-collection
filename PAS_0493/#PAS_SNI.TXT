@@ -1,0 +1,10 @@
+This archive contains snippets from the FidoNet Pascal Echo,
+for the month of April, 1993.  Pascal Snippets files will be
+distributed each month, under the filename of PAS_????.*
+where the ?'s are the month and year (example: 0493 for
+April, 1993), and the * is the archive format.
+
+
+These snippets are compiled by Steve Wierenga at 1:2613/228.2.
+
+[04/29/93]

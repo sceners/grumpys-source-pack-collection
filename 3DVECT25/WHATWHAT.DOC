@@ -1,0 +1,62 @@
+
+  What goes with What:
+
+  A little angel told me to summarize what files go with what....
+  eg: if you change anything in the math.inc file, re-assemble 3d?.asm
+      if you change anything in the stuff.inc file, re-assemble main?.asm
+
+  3d1.asm
+    vars1.inc
+    math.inc
+    xscale.inc
+    sin.inc
+    arctan.inc
+    poly.inc
+    squares.inc
+
+  3d2.asm
+    vars2.inc
+    math.inc
+    xscale.inc
+    sin.inc
+    arctan.inc
+    poly.inc
+    squares.inc
+
+  main1.asm
+    sphere.inc
+    gamecolr.inc
+    objects.inc
+    stuff.inc
+
+  main2.asm
+    sphere.inc
+    gamecolr.inc
+    objects.inc
+    stuff.inc
+
+  irq.asm
+    no included files
+
+  pmode.asm
+    no included files
+
+  xmode.asm
+    no included files
+
+  xmouse.asm
+    no included files
+
+
+  files for definition of externals:
+
+  eg, if you want to call some routines in xmode, have include xmode.inc in
+  your assembley file.
+
+  3d.inc
+  irq.inc
+  pmode.inc
+  xmode.inc
+  xmouse.inc
+
+

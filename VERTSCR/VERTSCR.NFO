@@ -1,0 +1,126 @@
+
+
+COMMENTS:
+       
+       A cute little credits type verticle scroll (or pan, if you like..)
+
+             Written by Draeden /VLA - 7-25-93
+
+
+INCLUDED MAY BE ONE OR MORE OF THE FOLLOWING:
+
+    VSCR2.EXE
+    VSCR2.ASM       <- Scrolly with small text
+    VSCR3.EXE
+    VSCR3.ASM       <- Scrolly w/ 4x as big text
+    VSCR4.EXE
+    VSCR4.ASM       <- Scrolly w/o shading
+    MODEX.INC       <- My modeX routines/ macros
+  MXFONT2.INC       <- Cheap and simple modeX text routines
+
+  And possibly some more stuff... depending on where you got it..
+
+    Alright.. been a while since our last tutorial code/text, but I think 
+this simple ditty is worth the wait.  I decided to write a verticle scrolly
+2 days ago at 10pm and got it looking good around 11:30...  Today I decided
+that I should release the code, since what I did was SO DARN SIMPLE.  
+    OK, maybe the program is a little hairy at parts because of the messing
+with the palette, but the continuous scrolling IS pretty simple...
+
+    Anyways, to the code...
+
+    Well, first off, let me explain what I'm doing... I am panning
+downward (increasing the STARTING OFFSET register) by the width of the 
+screen for each frame.  When I reach the offset that would make it so I am 
+only showing the second page, I go back to the minimum offset.
+Lemme show off my ansi skills and draw a diagram. =)
+
+SCRW = width of screen in bytes- for a 320 wide screen that would be 80 bytes
+
+offset 
+~~~~~~
+0           ÚÄÄÄÄÄÄÄÄÄÄÄ
+            ³   This is the split screen area
+            ³
+            ³
+            ³
+base        ÃÄÄÄÄÄÄÄÄÄÄÄ <- The minimum of our start offset
+            ³   This is the top of page 1
+            ³
+            ³
+            ³
+            ³
+            ³
+            ³
+base +      ÃÄÄÄÄÄÄÄÄÄÄÄ <- The maximum we let our START OFFSET get to
+ height of  ³
+ scroll*SCRW³   And this is page 2
+            ³
+            ³
+            ³
+            ³
+            ³
+            ÃÄÄÄÄÄÄÄÄÄÄÄ
+            ³        <- A varying amount of extra video memory
+            /        <- where you can put whaever you want
+            /        <- Possibly a font, so you can copy it quickly 
+            ³        <- with write mode 1
+            ÃÄÄÄÄÄÄÄÄÄÄÄ <- This is the 'next line' buffer area
+            ³            <- We want to write whatever we want displayed next
+64k         ÀÄÄÄÄÄÄÄÄÄÄÄ <- Right here
+
+
+CurOff = the current StartOffset
+
+    What you do each time you pan the screen up on pixel is:
+
+        1) Increase CurOff by SCRW and set START OFFSET register
+
+        2a) Wait for a verticle retrace
+
+        2b) Update the palette (this is only what I did.. obviously it is not
+            necessary if you don't want that palette trick.)
+
+        3) Copy a line from the 'next line' area to CurOff - SCRW
+            (or the old CurOff)
+
+        4) Copy the same line from the 'next line' area to 
+            CurOff + ScrollHeight*SCRW - SCRW
+
+        5) Increase the pointer used to access the current line in the 
+            'next line' area, if it goes beyond the max, reset to the min
+            and clear out the 'next line' area and fill with next text...
+
+
+    This will cause a slight messup at the bottom of the scroll because you
+    are displaying stuff that hasn't been updated yet...
+
+    You COULD fix that by carefully timing the writes to the video card, but
+    I say just cover it up with the split screen...  Kinda lazy, aren't I?
+    In this example I didn't have to mess with it cause the messed up area
+    was of the color black... and black on black isn't really noticable..
+
+    Ok, to make a stupid story short... ;)
+
+    I did the palette trick by setting up the screen similiar to the old 
+    palette induced 'copper bars'... Maybe that's not what to call them, 
+    but anyways, every line has a different palette color.  First line is
+    a 1, then 2, 3, 4, and so on...  Then I just change the palette in a
+    way similiar to the ol' palette bars, with the bars following the edge
+    of the scroll area...  Hmm.. maybe if you were really interested, you 
+    could go into the program and change the MAXCOLORS to 200 or so and
+    then set the split screen to 0, so you can see what is really happening
+    to the screen data and the palette...
+
+    Enuff docs..  I'm getting bored... =)
+
+    Oh, yeah, you can use this code for whatever you want.  Just give VLA
+    some credit for our hard(?) work...  And we take no responsibility
+    for whatever this code does, known or unknown.  If you don't like our
+    color selection, tough.  =)
+
+    BTW, I don't care if you rip our code as long as you greet us.
+    
+    Blah blah blah blah blah.  (That says it all.)
+    
+END COMMENTS

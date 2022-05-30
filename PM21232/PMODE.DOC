@@ -1,0 +1,924 @@
+Warning:
+  This document is intended for the experienced programmer with knowledge of
+a good deal of assembly and the 386. If you are not one such person, the text
+that follows will be very confusing to you. Read on if you wish... You have
+been warned.
+
+------------------------------------------------------------------------------
+Some crap:
+
+  This is the doc for PMODE v1.29a. I am not going to rewrite it just for
+version 2.1232 since almost all of this doc applies perfectly. There are a few
+changes from PMODE 1.29a to 2.1232 however. They follow at the end of this
+doc.
+
+  This code, as well as this doc (damn I hate writing dox), were written up
+by Tran (a.k.a. Thomas Pytel) of Renaissance. It is intended for all those of
+you out there who would like to code in protected mode, but keep running up
+against obstacles. If you want to use this thing as it is though, you will
+have to code in 100% ASM. But hey, that's no problem. I do it all the time. I
+did write this thing for myself. So if you have a problem with it, tough. You
+have a few options. You can use it as it is, and code in all ASM (not a
+terribly difficult feat). You can examine the code, and use what you learn to
+code up your own protected mode system, one that you can maybe throw into a
+nice high level language maybe. Or you can just ignore this code and this doc.
+
+------------------------------------------------------------------------------
+Intro:
+
+  Ah... many are the joys and woes of this chip we all know as the 386. The
+486 - bah, just a 386 with a cache. The 586 - hahaha, two 486s with double the
+cache. But the wonderful 386 architecture. That finally gives us our needed
+flat memory. Not to mention the paging (not a personal favorite, but VERY
+useful). It's been around here for a while now, but it hasn't been used very
+much. I'm assuming you know all the problems associated with sharing the
+386 protected mode amongst different programs. So I'll just go on to tell ya
+about two methods of doing this, VCPI and DPMI.
+
+  In the beginning (or at least a long time ago). There was the EMS and the
+XMS. Two pathetic attempts by the hopelessly crippled (design-wise) 8086s and
+286s. EMS and XMS were fine for accessing small chunks of a larger address
+space at a time. These methods were usually very slow. As for XMS, the 286
+actually had to copy memory every time it was requested. And hardware EMS
+resided on the slow system bus (well, not that much slower compared to the
+speed of those machines). With the introduction of the 386, and soon the
+memory managers, things changed. EMS and XMS could now be handled with the
+on-chip paging mechanism. Which was faster than the memory copy method, and
+even the hardware EMS. But for this task, the memory managers had to run the
+system in V86 mode. Forsaking all other programs which would want to take
+control of the 386 protected mode.
+
+  Thus was devised VCPI. A method of allowing programs running in the V86
+system to switch to protected mode. After switching to protected mode, those
+programs would have total control of the system. Running at a privilege level
+of 0. They could communicate with the other protected mode program, the VCPI
+server, through a common memory address space starting with the first megabyte
+of memory. VCPI was a superset of the EMS standard, and was implemented in
+virtually all memory managers and 386 extenders. But VCPI was woefully
+inadequate for the multitaskers that were soon to follow.
+
+  Then there came forth the DPMI standard. Born from the window, it is the
+epitome of total lameness. Many are the unknowing peons who run the window.
+And many are the lamer who do not know the purpose of our favorite key
+combination, the CTRL+ALT+DEL. A wondrous function of that eternal TSR called
+the BIOS. Many a fool activate it whilst on a local BBS, erroneously believing
+they will get free downloads. But I digress, we were all lame at one time or
+another. This standard of the DPMI was different from those of antiquity.
+This foul interface was designed with total control in mind. Total control
+by the evil host whose lameness was imposed upon all those running beneath it.
+At a lowly CPL3, this loathsome beast's clients are truly at a disadvantage.
+Their INs and OUTs under the thorough scrutiny of the master. Forced to
+grovel for precious memory. Not even their own instructions are sacred. For
+the fiend which is DPMI, patiently waits, and watches. Ready to tear the
+precious life from the pitiable client at the slightest sign of the forbidden
+CLI. Then the monster does its deeds, toggling an illusion of that which was
+once real. This virtual flag of interrupts ensures the depraved host total
+domination. So easy to hate it is this beast. But yet... In the name of
+multiple tasking, and system integrity. The DPMI continues to gain ground.
+(Well sure, if ya want those things. But where is your adventure... Your
+spirit... Have you totally forgotten what a good crash feels like???)
+
+  These days, VCPI and DPMI permeate the world of 386 software. From memory
+managers, to Windows and OS/2. If something is protected, its using one of
+these. VCPI though, is on its way out. Being replaced by DPMI. And if you want
+to code protected mode... Unless you force upon the user a clean boot, you
+have to support one of these two standards.
+
+------------------------------------------------------------------------------
+So what you got here:
+
+  Having coded raw flat protected mode, I am hooked. I shall not revert to
+real mode limitations. My previous protected mode system 'START32' was very
+intolerant of crap like VCPI and DPMI and EMS and XMS and everything else. It
+required a clean boot to function. But hey, for that I got pure wonderful
+flat protected mode. Unfortunately, the masses did not share my sentiment.
+And they whined about rebooting. Pitiful as they were, I have heard their
+cries. And I understand. The culmination is the code before you (or rather in
+the other file, PMODE.ASM). This is basically the same pure beautiful flat
+protected mode system as my old START32 system, except that it will run under
+VCPI and DPMI and XMS (albeit a little slower).
+
+------------------------------------------------------------------------------
+What it thinks it does:
+
+  The point of this protected mode header thingy is to provide a simple, flat
+mode environment for easy assembly coding. PMODE will take care of detecting
+a 386, the type of system (raw,XMS,VCPI,or DPMI) and making sure there is
+enough memory, both low and high. The protected mode code runs in one big
+segment, the size of which is infinite (or 4GB, whichever is larger). You can
+call real mode interrupts of far routines from your pmode code. And those
+in turn can call back to protected mode. And on and on like this to the limits
+of the stack. Once in pmode, all normal IRQs are still active and are by
+default, redirected to their real mode handlers. You can intercept these
+IRQs for your own use, then pass them on to the real mode handlers or not.
+
+  This system was coded with speed in mind. It is meant for stuff like games,
+demos (as in the ones with cool muzik and grafix), or stuff that needs a lot
+of memory. What you should not attempt from this system, is going TSR, or
+executing DOS programs. This system runs absolutely perfectly for what it was
+meant for in raw and XMS. There are some minor problems under VCPI and DPMI
+though, and i'll list them later. But right now...
+
+------------------------------------------------------------------------------
+First of all, the structure:
+
+  In PMODE.ASM, there are three segments. They are as follows:
+
+) CODE16 - A 16bit segment that holds all the real mode and 16bit protected
+           mode init and exit code. I'm not sure (I've forgotten by now), but
+           you should probably leave it as the first segment of the EXE.
+) CODE32 - The huge 32bit segment. You can throw in as much code as will fit
+           in low memory (no 64k fixup overflows). If you need more code
+           space, you're gonna have to load it into extended memory at runtime
+           and use it there. In pmode, addresses (code and data, they're the
+           same memory space) are offset from the beginning of this segment.
+           If you want to address something below the beginning of this seg,
+           you go about it in a different way. I'll explain later.
+) CODEEND - This MUST be the last segment in the EXE. It is the base for the
+            stack and low memory allocation.
+
+  The stack is an interesting animal (or was it a mineral¨). But anyway, you
+don't have to worry about the stack. The header will set it up to whatever
+you specify (up to a limit of 64k (there's a reason)). The same stack is
+shared by your pmode code and real mode calls (that's the reason). The stack
+always begins at CODEEND, and goes on for STAKLEN (a var declared at the top
+of PMODE.ASM) paragraphs. I will explain how its used by both pmode and real
+mode code later.
+
+  There are two heaps you can allocate memory from at run time. Low memory,
+which is all conventional memory below A0000h. And extended memory, all the
+nice crap above 1M. There's a reason for keeping them separate (other than
+that big hole between A0000h and 100000h (which I did not want to fill in or
+rearrange with paging)). DOS can only see the low heap. So in calls where you
+have to pass buffer addresses, you must pass only buffers that you have in low
+memory. Low memory is the place where you would allocate any critical disk or
+DMA buffers (more on a few potential problems with DMA later).
+
+  You call real mode interrupts and far routines with 'virtual registers'.
+Memory images of the registers as they will be set for the real mode int or
+proc. Code in real mode can call protected mode routines with those same
+'virtual registers'.
+
+  This thing has a few 'functions' for dealing with low and high memory and
+getting and setting IRQs. There are also some variables made available to ya
+which you'll find quite useful.
+
+------------------------------------------------------------------------------
+Details of runtime:
+
+  I'm assuming you know all about selectors and descriptor tables and stuff
+like that. But going on... After it does all that it needs to, PMODE will
+jump to an external label in code32 called '_main'. This is where your 32bit
+code takes over. When you gain control:
+
+) The stack is all set up.
+) The interrupts are disabled (and have been all the way from real mode) just
+  in case theres something you want to do first (like shut them all off at
+  21h and 0a1h, or replace all the vektorz (so what if I spell it vektorz)).
+) CS points to the code segment you're running in (duh...).
+) DS,ES,FS, and SS point to an alias of the code segment (same memory). (In
+  case you don't remember, you can NEVER write to a CS: override in protected
+  mode... Read, yes... But not write).
+) GS is a segment that's just as big as the others (infinite, remember?...)
+  but starts at absolute 0. This is ofcourse useful for accessing the real
+  mode int vektor table, or the BIOS data area, or the PSP, etc...
+
+
+Selectors:
+
+  There are three main selectors you have to know. '_selcode', '_seldata', and
+'_selzero' are 16bit word vars you can access to get the selector values for
+the code, data, and zero (GS) segments respectively. Their values are 8, 10h,
+and 18h under all protected systems except DPMI. As I said, on getting to
+_main, CS=_selcode, DS=ES=FS=SS=_seldata, and GS=_selzero. You can change the
+segregs if you wish (for example to do a REP MOVS in the zero seg). But the
+PMODE 'functions' and ints expect the segregs to be these values (except for
+the special case of SS, this will be explained later). And these must be the
+values when you jump to '_exit' to return to DOS. Another thing that is
+assumed by PMODE is DF=0 (direction flag is clear (like the CLD instruction)).
+This is because most string moves are forward. If you want to do a string move
+the other way, go ahead. Just do a CLD after.
+
+
+Linear addresses:
+
+  As I said, in pmode, all addresses are relative to the beginning of the
+CODE32 segment (which could start anywhere in low memory). For this reason,
+you must adjust any physical memory pointers before you use them. That is,
+to access something at B8000h (B800:0000, if you haven't noticed, I'm using
+all true linear addresses in this doc, no need for the seg:off crap). Anyway,
+If you want to write to B8000h, it will not be at DS:B8000, but at
+DS:(B8000h-linear address of the beginning of CODE32). And this linear address
+is stored in a variable called '_code32a'. So if the segment CODE32 was 1F43,
+the linear address would be 1F430h (seg*10h remember¨). So to get a pointer
+to B8000h, you would do something like:
+
+  mov eax,0b8000h
+  sub eax,_code32a
+
+  And just this macro is provided in PMODE.INC, as well as a macro to go the
+other way, relative address to physical. Ofcourse, if you address something
+with GS (assuming GS is _selzero), you can use the actual unadjusted linear
+address. The absolute linear address for CODE16 is also provided in
+'_code16a'. As well as the absolute linear address of the PSP in '_pspa'. The
+linear addresses '_code16a' and '_pspa' will always be less than '_code32a'.
+To access them (memory pointed to by them, these vars are in CODE32), you will
+have to use one of two methods. One is easy enough, just use the GS segment.
+Or you could use negative indexes from the normal segment. This relies on the
+4G wraparound (don't worry, the limits of all segments in the descriptor table
+are 4G). Strange things may happen if the 686 doesn't support the 4G wrap, but
+from what I understand, the 586 is still limited (limited??? damn it, even CDs
+don't reach that) to 4G segments.
+
+
+Memory (dis)organization:
+
+  As for the memory. You have those two heaps, low and high (extended) memory.
+Each of which is guaranteed to be at least as much as you specified in LOWMIN
+and EXTMIN at the top of PMODE.ASM. PMODE will hog up all low memory (because
+its meant to run standalone), and it will attempt to grab all the high memory
+it can. Two dwords hold information about each memory area. '_lomembase' and
+'_lomemtop' specify the base and top of the low memory pool as relative
+addresses (ready to use, no adjustment needed). The total amount of low memory
+available in bytes is _lomemtop-_lomembase (notice _lomemtop points to one
+byte beyond the last available byte). The _getlomem 'function' is a very
+simple routine that takes a length in EAX, and checks to see if there is
+enough low mem. If there is enough, it adds the length to _lomembase and
+returns a pointer (ready to use) in EAX to the low memory block along with the
+carry flag clear. If it finds that _lomemtop-_lomembase > length (not enough
+memory), it returns with the carry flag set and EAX undefined. '_himembase',
+'_himemtop', and '_gethimem' are the same thing for high mem as those other
+things are for low mem. Just to make sure you understand this, here is some
+code, cuz as we all know, code speaks louder than words (actually, silence
+speaks louder than code, but what the hell).
+
+  xor al,al
+  mov edi,_lomembase            ; fill all available low memory with 0
+  mov ecx,_lomemtop
+  sub ecx,edi
+  rep stosb
+  mov edi,_himembase            ; ditto for high memory
+  mov ecx,_himemtop
+  sub ecx,edi
+  rep stosb
+
+  There is one other curiosity provided. '_getmem' will get a any block of
+memory. It will first check low memory, and if there is not enough, it will
+check high memory. If you wish, you can code yourself a little 'malloc'
+library that will deal with blocks, and provide you with all the joys of
+fragmentation.
+
+
+Calling icky real mode:
+
+  I did say you can call real mode, and back. Let me first say that this is
+only provided so that you can call real mode interrupts, and routines that
+you don't want to recode in protected mode. I would not suggest making it a
+habit of coding across modes. Except maybe if you do a driver that you also
+want to work from real mode. But anyway... You can call real mode interrupts
+or procedures from protected mode through INT 32h (call real mode far proc)
+and INT 33h (call real mode int). These interrupts are only available to the
+protected mode part of your program. In real mode, there is a separate INT 32h
+that calls a protected mode routine. Don't confuse the two INT32s with each
+other, though they do basically the same thing. To pass register values across
+modes, you use 'virtual registers' (I just love that word... virtual... haha).
+These 'virtual registers' are merely memory images of EAX,EBX,ECX,EDX,ESI,EDI,
+EBP,DS,ES,FS,and GS. AL and AH and AX and BL ... etc ... are there too, and
+they share the appropriate memory space with each other so if you change the
+'virtual' AH register, the 'virtual' AX and EAX registers will be changed
+accordingly. You'll notice there are no SS,ESP,CS,EIP registers. CS:EIP is
+taken from the real mode interrupt vektor table for int calls, and passed in
+the real CX:DX registers for a procedure call. SS:ESP is set up in the master
+stack used by PMODE. Which is the stack your program runs on. I'll explain the
+stack handling in detail l8r. Heres a breakdown of the ints:
+
+) INT 33h from pmode: Do a real mode interrupt.
+  AL=interrupt you want to do. All V86R_??? general and segment registers will
+  be passed to the real mode handler. They will also be passed back as the
+  return values. The carry, zero, aux, parity, sign, and overflow flags will
+  be passed back as the actual CPU flags. The real mode interrupt will be
+  called with interrupts disabled (as it is usually). Keep in mind, no CPU
+  registers will be modified (except the flags mentioned). Only their V86R_???
+  images will be changed by the real mode int handler.
+
+) INT 32h from pmode: Call a real mode far procedure.
+  CX:DX=seg:off you want to call. The register passing works just like INT33.
+  Except that the interrupt flag will be preserved across the call to real
+  mode (but not back, the IF flag will be in the same state as it was before
+  the int).
+
+) INT 32h from real mode: Call a pmode procedure.
+  EDX=off. A 32bit offset in the CODE32 segment. The register passing works
+  just like for the other INT32 in pmode, except that segregs are not passed
+  to or from the pmode routine. Upon entry to the routine, the system standard
+  thingys are set. That is:
+    CS=_selcode, DS=ES=FS=SS=_seldata, GS=_selzero, DF=0 (CLD).
+  And they must be that when the thing executes its RET (not RETF).
+
+
+DPMI takes its toll and IRQs:
+
+  Upon startup, all the interrupt vektors for IRQs point to routines that
+redirect the IRQs to their default real mode handlers. You can hook into any
+IRQ you want. There are two dword pointers that allow you to get and set IRQ
+vektorz. '_getirqvect' and '_setirqvect' point to routines to get and set the
+linear address of the handler for specific IRQs within the CODE32 segment. To
+get the address of a handler, just do a 'call _getirqvect' with BL set to the
+IRQ num you want (0-15). EDX will be returned pointing to its current handler.
+To set an IRQ, pass BL again as the IRQ number, and EDX as the offset of the
+new handler. You can chain to the old handler if you want just by jumping to
+the old address when your handler is done processing.
+
+  When your IRQ handler is called, you can be sure of only one thing. The IF
+flag is clear. All the general regs and segregs should be treated as
+undefined. It would seem logical that if SS=_seldata throughout the entire
+code, it will be that in the IRQ. And this is true under all systems except
+DPMI. DPMI deems it fit to switch onto another stack. And that's the stack
+your handler must be on when it does its IRETD. You can switch stacks during
+processing if you want, but I really don't suggest doing that. Also, if you
+intend to call INT32/33 from your handler (you can, they are all totally
+reenterant), you must be on that stack (DPMI requirement of a mode switch it
+seems. I've tried to switch onto another stack (yes locked) and switch to
+real mode (using DPMI raw mode switching and state saving) but DPMI dies if
+another IRQ goes off in real mode).
+
+  Another consideration for DPMI is the IF flag. According to DPMI specs, only
+CLI, STI, and INT 31h functions AX=900h and AX=901h should be counted on to
+modify the interrupt flag (POPF(D) and IRET(D) should not). This is because
+certain DPMI systems might have to virtualize the interrupt flag, and keep the
+real flag enabled at all times (but don't worry, if the 'virtual' flag is
+clear, your program will not get any IRQs). In practice, certain DPMIs do
+allow IRET(D)s and POPF(D)s to modify the virtual interrupt flag. But this is
+inconsistent across them. So if you want DPMI compatibility (you probably do,
+or you would not be using this code), you should follow these rules:
+
+) CLI and STI are allowed, and do their functions.
+) Don't assume anything about POPF(D) and IRET(D) and the interrupt flag.
+) Don't assume the interrupt flag PUSHF(D) stores on the stack is correct,
+  it might be the real flag or the 'virtual' flag.
+) These DPMI INT 31h functions are supported under all systems.
+  ) AX=900h: Get state of IF and disable it. Returns AL set to the IF flag.
+  ) AX=901h: Get state of IF and enable it. Returns AL set to the IF flag.
+  ) AX=902h: Only returns AL set to the IF flag (0=disabled, 1=enabled).
+) At the end of an IRQ handler, put a STI. When the handler is called, flags
+  are automatically disabled. And if you do not reenable them, and neither
+  does the IRETD... Well... you get the point.
+
+
+The stack entity:
+
+  PMODE uses one major stack for both pmode and real mode. This stack is
+always located in low memory (always locked under DPMI). The size of the stack
+is set at the top of PMODE.ASM in the var 'STAKLEN'. There is another var
+there called 'STAKSAFE', and this is what must be explained.
+
+  When a mode switch occurs, the new stack is the old stack base minus
+STAKSAFE paragraphs. The stack base is the stack location when your program
+starts. And it is only modified by mode switches. An example is in order here.
+
+  Say your program starts, and you have a STAKLEN of 100h (1000h bytes) and
+a STAKSAFE of 20h (200h bytes). After you have pushed a few values, and are
+about to call real mode, the stack has gone down to 0F30h. After the mode
+switch, the location in the stack will be 0E00h (1000h-200h). Now in real mode
+you push some values. And the stack goes down to 0DE0h. Then you make a call
+to protected mode. The protected mode stack will start at 0C00h (0E00h-200h).
+After the return to real mode, the stack will be back to 0DE0h. You pop your
+values and return again. Back in protected mode, the stack will be where it
+was before the initial call to real mode, at 0F30h. So STAKSAFE is the maximum
+stack size that is safe from modification if a mode switch occurs. But beware,
+an IRQ that goes off that is redirected to the other mode is a mode switch.
+That is, an IRQ in protected mode that is redirected to real mode will cause
+the stack change. As will ANY IRQ in real mode (since it temporarily goes to
+pmode, and is redirected back to real mode). An IRQ that occurs in pmode, and
+is NOT sent to real mode is NOT a mode switch.
+
+  Under DPMI things are slightly different. DPMI handles its own stack
+switching. Any IRQ causes a switch to a totally different stack. It gets a
+little complicated as DPMI does its switching among 4 different stacks. I
+was not able to put in my own IRQ redirectors to real mode, so you have to
+rely on DPMIs redirectors (which in some cases don't redirect the IRQs as they
+should). It seems even DPMI has problems managing its own stacks. Perhaps I
+missed some critical little point. But I don't think so... Even with state
+saving and the raw mode switching, if I switched off the stack the DPMI host
+provided for an IRQ, then jumped to real mode, and another IRQ occurred...
+Well... Let's just say that was the end of that. This may be a little
+confusing, so let me summarize what will keep you safe:
+
+) In an IRQ handler, DON'T switch off the stack it is entered with. Which is
+not guaranteed that SS=_seldata.
+) Don't do more nested calls across modes than (STAKLEN/STAKSAFE)-1. (-2 if
+you just want to be totally safe).
+) You CAN safely assume SS=_seldata in protected mode only in your main stream
+of execution, and in routines that are called with INT32 from real mode.
+) Consider your maximum effective stack size to be STAKSAFE, not STAKLEN.
+) You CAN call across modes using INT32/33 from an IRQ handler in both real
+and protected mode (useful for that pesky mouse callback thingy).
+
+
+Exceptions:
+
+  Are handled entirely by the DPMI host in those systems. In raw, XMS, and
+VCPI, exceptions 0, 1, 2, 5, and 7 are reflected to real mode just like IRQs
+would be (they are sent safely (actual real mode)). Exceptions 3, 4, 8 and
+9-1fh cause immediate termination. There is no debug dump done. If you want
+though, you can put in your own. The main exception handler is 'cp_exc'
+somewhere around line 1828 in PMODE.ASM. As you can see from the little entry
+code above it, it is entered directly from an exception with all registers
+pushed and AL=exception number. And as you can see all it does is load up the
+system default thingies and jumps to _exit. Just to clarify, it loads up DS,
+ES, and FS with 10h and not _seldata simply because this is an exception
+handler only for raw, XMS, and VCPI. Under which _seldata always equals 10h.
+
+------------------------------------------------------------------------------
+The 'virtual' registers might be a little confusing:
+
+  So here's some semi-sorta-pseudo-code.
+
+all_genregs     = [EAX, EBX, ECX, EDX, ESI, EDI, EBP]
+all_segregs     = [DS, ES, FS, GS]
+all_regs        = [all_genregs, all_segregs]
+all_v_genregs   = [V86R_EAX, V86R_EBX, V86R_ECX, V86R_EDX,
+                   V86R_ESI, V86R_EDI, V86R_EBP]
+all_v_segregs   = [V86R_DS, V86R_ES, V86R_FS, V86R_GS]
+all_v_regs      = [all_v_genregs, all_v_segregs]
+IF_stat         = current interrupt flag status
+pre-int_IF_stat = interrupt flag status before the software INT 32/33
+other_IF_stat   = interrupt status to set for the procedure/int called
+
+INT 32h from protected mode:
+  PUSH  all_genregs
+  PUSHF                         ; just for show, they are assumed to affect
+  CLI                           ; the interrupt flag.
+  MOV   other_IF_stat,pre-int_IF_stat
+  JMP   realmode
+backtopmode:
+  MOV   DS,_seldata
+  MOV   ES,_seldata
+  MOV   FS,_seldata
+  MOV   GS,_selzero
+  POPF
+  POP   all_genregs
+  IRETD
+realmode:
+  MOV   all_regs,all_v_regs
+  MOV   IF_stat,other_IF_stat
+  CALL  procedure
+  CLI
+  MOV   all_v_regs,all_regs
+  JMP   backtopmode
+
+INT 33h from protected mode:
+  PUSH  all_genregs
+  PUSHF
+  CLI
+  JMP   realmode
+backtopmode:
+  MOV   DS,_seldata
+  MOV   ES,_seldata
+  MOV   FS,_seldata
+  MOV   GS,_selzero
+  POPF
+  POP   all_genregs
+  IRETD
+realmode:
+  MOV   all_regs,all_v_regs
+  CALL  interrupt
+  CLI
+  MOV   all_v_regs,all_regs
+  JMP   backtopmode
+
+INT 32h from real mode:
+  PUSH  all_regs
+  PUSHF
+  CLI
+  MOV   other_IF_stat,pre-int_IF_stat
+  JMP   pmode
+backtorealmode:
+  POPF
+  POP   all_regs
+  IRET
+pmode:
+  CLD
+  MOV   DS,_seldata
+  MOV   ES,_seldata
+  MOV   FS,_seldata
+  MOV   GS,_selzero
+  MOV   all_genregs,all_v_genregs
+  MOV   IF_stat,other_IF_stat
+  CALL  procedure
+  CLI
+  MOV   all_v_genregs,all_genregs
+  JMP   backtorealmode
+
+------------------------------------------------------------------------------
+Potential DMA problems:
+
+  As you know, the DMA controllers in the PC use all physical addresses.
+Nothing but the processor itself knows how linear memory is arranged in the
+physical memory banks. When paging is disabled, the relationship is very
+simple. The linear address is always the same as the physical address. But
+when you enable paging, that could get all screwed up. In raw mode and XMS,
+you don't have to worry about this since paging is disabled. But under VCPI
+and DPMI things are different. You can almost definately count on extended
+memory addresses not being consistent with their physical addresses. Low
+memory however, will usually map perfectly to its physical addresses. Unless
+the program is running in some sort of multitasking system. Then the chances
+are slim. The point is that you can't trust DMA much under VCPI and DPMI.
+
+  There is something called VDS (Virtual DMA Specification). This is the
+recommended way of handling DMA under VCPI and DPMI. I don't know too much
+about it now though. Maybe in the future I'll put something in based on that
+for DMA stuff. But for now your options are:
+
+) Don't use DMA (Not too hard, except if you wanna do SB output).
+) Try to use DMA normally. It will work in raw and XMS, and most probably
+under VCPI and DPMI if they are not multitasking your program.
+) If you know how to use VDS, feel free... (real mode int calls, remember¨)
+
+------------------------------------------------------------------------------
+And now to discuss some of the finer points of raw mode:
+
+  Which is when this thing does not find anything that is running the system
+in V86 mode, and it can do all of its own protection control. This is the best
+possible way this thing can be run. The protected mode system runs at a CPL0.
+All IRQs and ints are handled through interrupt gates rather than task gates
+for speed. There is no task switching done at all, even to go to V86 mode.
+Paging is disabled to avoid that extra little bit of overhead. All IRQs are
+by default redirected to real mode (not true under some DPMIs). Actually real
+mode is V86 mode, still under the control of PMODE. So any IRQs that happen
+while a real mode thingy is being processed are taken immediately to protected
+mode. Where if you have a handler, it gets control right away. There were some
+problems with my old 'START32' code and the A20. I was not waiting for it to
+go stable, and was not testing to make sure. This has been fixed. If the A20
+fails to enable through the standard AT method or the PS2 method, PMODE will
+quit with an error message. All DMA in raw mode is real, since ALL linear
+addresses are the actual physical addresses because paging is disabled. The
+interrupt flag is real. When you disable interrupts, they are disabled, and
+will not screw up anything that might be timing sensitive as well as interrupt
+sensitive.
+
+  So if you need to do something like time the vertical or horizontal retrace
+on your monitor, this is the mode you (or whoever) should be running in.
+
+------------------------------------------------------------------------------
+XMS:
+
+  Is basically raw mode. Except that instead of INT 15h AH=88h, the XMS driver
+is used to allocate and lock extended memory. There is only one potential
+problem (and this goes for raw mode as well). If something tries to go to
+protected mode while in a real mode interrupt call, it will screw up.
+Obviously because the system is already in protected mode under the control of
+PMODE. This mode switch attempt would usually be the result of the XMS driver
+trying to copy memory for something. Or a disk cache that uses extended mem.
+
+------------------------------------------------------------------------------
+VCPI:
+
+  This is actually a slightly worse mode to run in than DPMI. True that VCPI
+is also basically raw mode. The CPL is 0, and there is nothing scrutinizing
+the execution of your code. Paging is enabled, but that is a minor detail.
+The problem comes with the way VCPI compatibility works. To call a real mode
+interrupt or procedure, PMODE has to pass protected mode control back to the
+VCPI server. This comes out to one thing. IRQs that occur in a real mode call
+will NOT make it to your protected mode handler. I'm sorry, there is nothing
+I can do about this, it's just the way VCPI works. Yes it is possible to go
+V86 yourself to service the real mode call. Believe me, I've tried it. But the
+problem is that under VCPI systems, most of the real mode stuff (including
+DOS) are very dependant on EMS. And if control is not passed back to the VCPI
+server, EMS will not function. In fact, most memory managers require that the
+server watch for the execution of a certain interrupt from real mode, and
+intercept it. The actual interrupt vector in the real mode table might point
+into limbo. But as long as the VCPI server is in control, it will be handled
+properly. There are a few ways you could work around this:
+
+) Do the IRQ handler in real mode. That way, it will always be called no
+matter what is in control. But this seems to defeat the purpose of protected
+mode. And if this is a timing critical IRQ, you have a problem because passing
+control from a program (PMODE) to the VCPI server to execute the real mode
+IRQ callback takes a bit of time. Not a terrible amount, but it is a delay.
+
+) Do the IRQ handler in protected mode, and keep real mode calls to a minimum.
+For example, disable all but the critical IRQs to your program. And try to
+handle as many as you can in pmode. (You can read the keyboard direct from the
+hardware can't you. And you do know how to output FFh to A1h and FDh to 21h).
+But remember one thing... When you go to do a real mode call (DOS file call or
+something else you can't do yourself). Whatever the hardware cause of your IRQ
+will still be active. And if an IRQ occurs in real mode, and there is no real
+mode handler for it. Well, you know... So you either put in some valid real
+mode handler that may merely set a flag that you have an IRQ to service. Or
+disable the source of the IRQ (mask it off at 21h or A1h).
+
+  VCPI also has the little problem of the possibility of inconsistent linear
+with physical addresses. Which means DMA is screwed. Generally speaking,
+unless the VCPI is coming from a multitasking thingy like DesqView, the low
+memory addresses will be accurate. As I said, I'm thinking of ways to solve
+this little problem. But for now, if you want to do something that requires
+DMA. If you know how to work VDS, you can try it with the real mode int calls.
+Or you can tell whoever is running your program, that if it doesn't work, to
+do a clean boot.
+
+------------------------------------------------------------------------------
+DPMI:
+
+  Actually, DPMI is not that bad for what it was designed to be. It could be
+a little more consistent across its implementations, but oh well. I am a
+game/demo/speed freak however. I don't like the overhead imposed by the paging
+and CPL3 (in CPL3, certain instructions have to be emulated by software...
+Luckily they are not very common instructions). And multitasking in general
+is not that hot when you're trying to do a timing critical action game. But
+we're stuck with what we're stuck with. I figure running in real mode under
+DPMI is even slower than protected mode.
+
+  One really annoying problem with DPMI is that current implementations are
+far from perfect. QDPMI 1.01 for example, dies when an IRQ occurs in a pmode
+call from a real mode IRQ. DPMI dox say this shouldn't happen, and it doesn't
+under Windows 3.1 DPMI implementation. Thus, QDPMI 1.01 is buggy. And who
+knows how many other DPMIs out there.
+
+  For those of you who know DPMI. I am using the raw mode switch routine to
+do cross mode calls with INT32/33. I am ofcourse also saving the state on the
+stack. So it is perfectly reenterant. Just as a minor note, DPMI converts the
+environment segment in the PSP to a protected mode selector. I convert it back
+to the segment after going pmode with DPMI. But since DPMI needs the selector
+for the final return to real mode, I put it back then. But you can count on it
+being a real mode type segment.
+
+  Hmm, another little problem is that I'm not sure how many DPMIs out there
+actually reflect IRQs to real mode if they occur in protected mode. Windows
+3.1 seems to send them all over as it should. QDPMI however sends IRQ1, but
+not IRQ0. And it also doesn't seem to pass IRQs that occur in real mode
+through their protected mode handlers. Again, Windows 3.1 does. And from what
+I read in the dox, the Windows way is the way DPMI is supposed to be done.
+
+------------------------------------------------------------------------------
+Some misc notes:
+
+) Under VCPI, this thing will map as much extended memory as it can, up to
+60M, without allowing the page tables to use up more memory than would leave
+LOWMIN. Allocating up to 60M means there is an absolute highest amount of
+extended memory under VCPI of 59M (even if there is more available).
+
+) Yes, this thing modifies its own code.
+
+) Before exiting your program, you do NOT need to restore any IRQ vektorz
+(pmode that is, if you modified the real mode vektor table, you gotta restore
+it). And you do not have to restore the IRQ masks at 21h and A1h (PMODE stores
+them before jumping to _main, and restores them before exiting).
+
+) If youre gonna add other segments (16bit right¨), put them in between CODE16
+and CODE32 only if they're small enough to still allow access to CODE32 data
+from CODE16. Otherwise put them between CODE32 and CODEEND. You can also just
+stick your 16bit code in a CODE16 segment.
+
+) The '_ret' label is provided simply because there are usually a lot of jumps
+that go to a RET. Just a minor convenience for myself.
+
+) Yeah the code is a total mess. I did not know many of the workings of VCPI
+and DPMI when I started. But hey, at least its functional.
+
+) Remember that upon reaching '_main', interrupts are still disabled. Don't
+forget to do the STI.
+
+) I hope you realize with pmode IRQ handlers, you don't have the BIOS to
+redirect IRQ9 to IRQ2. So any device that uses IRQ2 will actually be using 9.
+
+) Remember that the INT31 AX=9?? flag functions are only available in pmode.
+Go ahead, use the PUSHFs and POPFs in real mode to alter the IF flag... And
+any DPMI host that can't handle that properly deserves to crash.
+
+) The one byte INT3 instruction and INTO are treated as exceptions in pmode,
+and cause immediate termination (unless you change that in PMODE.ASM). In real
+mode they are sent to their real mode handlers.
+
+) I would REALLY suggest not ever switching your stack in protected mode
+yourself.
+
+) This thing was coded under TASM 3.0. So if you have something different,
+don't blame me if it doesn't compile.
+
+) For those of you who didn't realize it. There are no memory free functions
+for low and high mem because all you have to do is subtract the amount you
+want to free from '_lomembase' or '_himembase'.
+
+------------------------------------------------------------------------------
+Heres a list of the vars provided by PMODE to your program:
+
+_lomembase:dword
+  Low mem base for allocation (first free byte).
+
+_lomemtop:dword
+  Top of low mem (last free byte +1).
+
+_himembase:dword
+  High mem base for allocation (first free byte).
+
+_himemtop:dword
+  Top of high mem (last free byte +1).
+
+_pspa:dword
+  Absolute linear address of start of PSP.
+
+_code16a:dword
+  Absolute linear address of start of CODE16.
+
+_code32a:dword
+  Absolute linear address of start of CODE32 (32bit code offset from this).
+
+_selcode:word
+  Code segment selector.
+
+_seldata:word
+  Data segment alias selector for code.
+
+_selzero:word
+  Data segment starting at absolute 0.
+
+_irqmode:word
+  Bitmap for all 16 IRQs (actually 15, but were ignoring 2) of how they should
+  be redirected to their real mode handlers (this is new to PMODE 2.1232).
+
+_sysbyte0:byte
+  System bits, they have the following meanings (if I work on this system,
+  in the future they may also contain information on DMA maybe).
+  bits:
+    0-1: 00=raw, 01=XMS, 10=VCPI, 11=DPMI
+    2-7: undefined
+
+_getirqvect:dword
+  A pointer to the get IRQ function appropriate for the mode.
+  The function takes arguments as follows:
+    In:
+      BL - IRQ num (0-0fh)
+    Out:
+      EDX - offset of current IRQ handler
+
+_setirqvect:dword
+  A pointer to the set IRQ function.
+    In:
+      BL - IRQ num (0-0fh)
+      EDX - offset of new IRQ handler to set
+
+------------------------------------------------------------------------------
+And now some 'functions'. Remember, when calling any of them, you should have:
+  CS=_selcode, DS=ES=FS=_seldata, GS=_selzero, DF=0 (CLD).
+
+_getmem:
+  Allocate any mem, (first cheks low, then high)
+  In:
+    EAX - size requested
+  Out:
+    CF=0 - memory allocated
+    CF=1 - not enough mem
+    EAX - linear pointer to mem or ? if not enough
+
+_getlomem:
+  Allocate some low mem
+  In:
+    EAX - size requested
+  Out:
+    CF=0 - memory allocated
+    CF=1 - not enough mem
+    EAX - linear pointer to mem or ? if not enough
+
+_gethimem:
+  Allocate some high mem
+  In:
+    EAX - size requested
+  Out:
+    CF=0 - memory allocated
+    CF=1 - not enough mem
+    EAX - linear pointer to mem or ? if not enough
+
+_lomemsize:
+  Get amount of free low mem
+  Out:
+    EAX - number of bytes free
+
+_himemsize:
+  Get amount of free high mem
+  Out:
+    EAX - number of bytes free
+
+_getirqmask:
+  Get status of IRQ mask bit (at port 21h or A1h)
+  In:
+    BL - IRQ num (0-15)
+  Out:
+    AL - status: 0=enabled, 1=disabled
+
+_setirqmask:
+  Set status of IRQ mask bit
+  In:
+    BL - IRQ num (0-15)
+    AL - status: 0=enabled, 1=disabled
+
+_exit:
+  Exit to real mode
+
+------------------------------------------------------------------------------
+And now, 2.1232:
+
+  Aside from a few typos in the doc, PMODE v1.29a was imperfect in another
+way. In raw/XMS mode, it executed real mode calls in V86 mode. Locking out
+anything in the real mode system that needed to switch to protected mode
+temporarily. This could be the XMS manager or a disk cache usually. And under
+VCPI it executed all real mode calls by giving control back to the VCPI server
+under all conditions. Sometimes this might not be necessary, just to execute
+a minor real mode routine maybe. PMODE v2.1232 allows you to control what type
+of real mode call is done. Whether the call is executed in V86 mode under the
+control of PMODE, or if the system is switched back to actual real mode (or
+control passed back to the server in the case of VCPI).
+
+  I've added two new interrupts in pmode, INT 34h and 35h. Which have the same
+functions as INTs 32h and 33h respectively. The difference is that INT 32h and
+33h are the safe way to do the real mode calls. That is they actually return
+to real mode (pass control back to the server under VCPI) to handle their
+function. INTs 34h and 35h execute the real mode calls by switching the system
+to V86 mode and keeping PMODE in control. This has the advantage of keeping in
+place all your protected mode IRQ handlers. If you do one of the safe calls,
+the entire protected mode system is put on hold while the call executes. INT
+32h from real mode still does what it is supposed to. No matter if it executed
+from a safe or a V86 real mode call.
+
+  The way IRQs are redirected to their real mode handlers can also be
+controlled by you. The '_irqmode' word defines how each of the 16 IRQs are
+redirected to real mode. Bits 0-15 stand directly for each of the 16 IRQs. A 1
+in an IRQ bit means that the IRQ will be redirected safely (switch to actual
+real mode). A 0 means the system will switch to V86 mode to do the IRQ handler
+under the control of PMODE. '_irqmode' starts out with all bits set (all IRQs
+are redirected safely).
+
+  PMODE 2.1232 no longer reprograms the interrupt controllers for different
+base vectors for the hardware IRQs. PMODE 1.29a did that to relocate the low
+8 IRQs from the 386 exception vectors. Since it always did real mode calls in
+V86 mode, it could always redirect the new vectors back to their default real
+mode values. But 2.1232 can actually return to real mode where the IRQs cannot
+be redirected through the pmode IDT. And doing 16 real mode IRQ redirectors
+might not be possible if VCPI remaps the vectors itself. And I don't like the
+idea of reprogramming the interrupt controllers every time an actual mode
+switch occurs (pmode/real, not pmode/V86). The way I did it now came out to be
+the best option in my mind. Any exceptions that are overridden by IRQs are
+lost. That is, any exception that has been overridden by an IRQ will be sent
+to that IRQ erroneously. The usual exceptions that are overridden are 8-0fh.
+All of which are terminal faults which you should not get in the first place.
+There is one exception that is treated in a special way. Exception 13 is
+needed for V86 real mode calls. As a result, it will always be on interrupt
+vector 13. Even if an IRQ overrides it (usually 5). But the IRQ will not be
+lost. When the handler for exception 13 gets control, it checks whether the
+source of an int is an IRQ or an actual exception. For you speed freaks out
+there, the check and redirection to IRQ handler in case of an IRQ takes 3
+instructions. Too bad, normally all pmode IRQ handlers get control as soon as
+physically possible (and appropriate to the system type (DPMI or not)).
+
+  If you didn't entirely understand that last paragraph (and I don't blame
+you). Let me sum it up. You can get and set and enable and disable all 16 IRQs
+as usual. Except that there will usually be a 3 instruction delay on IRQ5 in
+getting to its handler. Exceptions 8, 9, 10, 11, 12, 14, and 15 will not make
+it to the exception handler. Exception 13 will though.
+
+  Ofcourse these are all changes to the raw/XMS/VCPI side of the system. DPMI
+will still work exactly as it did in 1.29a. Under DPMI, there is no
+distinction between V86 mode and actual real mode. Thus, INTs 32h and 33h are
+handled in exactly the same way as INTs 34h and 35h. It comes out to be a more
+consistent int/IRQ system:
+
+) Under raw/XMS/VCPI:
+  ) IRQs that occur in protected mode will go directly to their protected mode
+    handlers, where they can be sent on to their real mode handlers or not.
+  ) IRQs that occur in a real mode safe call (INT32/33) will not make it to
+    the pmode handlers, but will go directly to their real mode handlers.
+  ) IRQs that occur in a real mode V86 call (INT34/35) will go on to the
+    pmode handlers, where they can be sent on to their real mode handlers or
+    not.
+) Under DPMI:
+  ) IRQs should ALWAYS go to the protected mode handler first, then may be
+    sent on to their real mode handlers or not. However, DPMI implementations
+    out there now are far from perfect, and may not always do that. They might
+    separate the two IRQ systems (IRQs in real mode go ONLY to their real mode
+    handlers. IRQs in pmode go ONLY to their pmode handlers, and cannot be
+    sent on to real mode).
+
+------------------------------------------------------------------------------
+Oh well...:
+
+  That's it for these minor additions to this doc and code. It should now be
+a very reliable system. The design could still be better, but whatever...
+PMODE.ASM is still a mess, but it is still functional. If you use this pmode
+system is some production, please give me credits somewhere in the thing...
+That's all I ask... L8r...
+
+  Tran ... (Thomas Pytel) of Renaissance.
+
+Greets to all my friends, and all the k00l coders of the world...
+Also, to all demo people (artists, muzicians, other coders, etc...)...
+
+Thanx to Tim Sweeny for the DPMI specs, and Josh Jensen (CyberStrike) for that
+VCPI doc.
+
+You can reach me on Creativity Demo Net or SBCnet as 'Tom Tran'...
+Or just call the Sound Barrier: (718)979-6629, (718)979-9406...
+Or Internet: tran@phantom.com...
+
+I would date this document, except that I don't know todays date. But I think
+it is now sometime at the beginning of June 1993... Or maybe not, Who knows...
+

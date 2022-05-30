@@ -1,0 +1,14 @@
+Program UpperWinColor;
+
+Const
+  TotalWanted = 5*3.14159263/2;
+  Start := -3.14159263/4;
+
+  Begin
+    For Count := 1 To 100 Do
+      Begin
+        Color := 31+(32*Sin(Start+Count*TotalWanted/100));
+        SetColor(Count,0,Color,Color);
+        FillChar(Mem
+  End;
+

@@ -1,0 +1,27 @@
+                     
+    * SIMPLE MODE-X TEXT/FONT ROUTINES *
+
+
+Included in this ZIP should be:
+
+    MXFONT.ASM  - A driver for the package
+    MXFONT.INC  - The package w/ all the code
+    MXFONT.EXE  - EXE for those w/o TASM
+    MXFONT.NFO  - This file
+     MODEX.INC  - A slugfull of MODE-X macros & ModeX setting PROC
+       VLA.NFO  - Info on VLA and how to contact us
+
+
+What is this MXFONT thing?
+컴컴컴컴컴컴컴컴컴컴컴컴컴
+
+    These routines are intended to help out anyone who programs with 
+Mode-X in assembler.  The routines are very simple and do their stuff with
+minimal overhead.  These can be VERY useful for debugging 'cause a BIOS 
+print does not work in planar mode...  Anyways... It's free.
+
+    I don't know if there's much interest for this type of thing, but 
+there has to be at least ONE person who will find this useful...
+
+    
+    Draeden /VLA

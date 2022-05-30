@@ -1,0 +1,30 @@
+This is a Y mode (320x200x256 colors, 4 pages) polygon and line blitter
+package.  Written by Dave Stampe (27/1/92).
+
+This contains routines to set the mode, set view and drawing pages,
+draw and clip lines, and draw clipped and unclipped polygons.
+Most of the routines are self-explanatory.  The clipped routines
+can accept any numbers between -32767 and +32767, and clip to the
+bounding box specified by t_clip, l_clip etc...
+
+The code is available for NON-COMMERCIAL use.  If you want to do anything
+commercial with it, please contact me once you finish development,
+c/o broehl@sunee.uwaterloo.edu
+
+Notes on speed: Measured on a 486/25 with a (pretty slow) Paradise VGA card:
+
+(small polys, typical of fine 3D)
+fastri() : 29,000 10x4 triangles/sec (no clippping)
+poly3()  : 19,000 clipped 10x4 triangles/sec
+vgaline() : 13,700 25-pixel vectors/sec
+
+(larger 24x24 polys, typical of coarse 3D)
+fastri(): 3400 polys/sec
+poly3() : 3200 polys/sec
+
+Note that poly4() has bugs when used with tiny polygons such as may be
+produced on the sides of 3D objects.
+
+polyn() uses fastri() to draw n-sided polygons: not optimal, but it works.
+A proper N-sided trapezoidal decomposition would be 50% faster on small polys,
+but I haven't got around to it yet.

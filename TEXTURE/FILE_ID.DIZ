@@ -1,0 +1,22 @@
+This package is FREEWARE so you may distribute it as much as you want to.
+Keep the contents of this ZIP in it's original form! 
+
+Files in ZIP:
+-------------
+
+TEXMAP.EXE              Texture mapped polygon rotating on screen
+FANTOM93.EXE            Same as above...
+3D.EXE                  3D-Demonstration
+TEXMAP.ASM              Source code for texture mapping routine
+UBLOGO.RAW              Rawdata for the Logo in 3D-demonstration
+KICK.RAW                Rawdata for the mainscreen in 3D-demonstration
+UBLOGO.PAL              Guess..
+KICK.PAL                Ups?!
+SIN.INC                 Sintable for 3D-rotation (3D-Demo)
+SINTABLE.INC            Sintable for Texturemapping routine
+TEXTURE.INC             Texturemap for texmap.asm
+TEXTPAL.INC             Palette for texturemap
+README                  Some info about these FINE products
+README.1ST              Control keys for the 3D demonstration
+FILEID.DIZ              List of files in this ZIP
+

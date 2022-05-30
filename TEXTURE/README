@@ -1,0 +1,43 @@
+                              
+                              About The Routine
+                              -----------------
+
+        I have always been interested in 3D-graphics & Texture mapping, yet 
+        I haven't found any really useful source code such which allow me
+        to create fast moving texture-mapped graphics and of course 3D-
+        graphics. For a long time I have been fighting for creating my own 
+        routines for these operations and finally I can say that I've done it.
+        For a reason unknown I'm now providing you with THE SOURCE CODE of 
+        the texture mapping routine, hope you like it! You might probably 
+        notice that there is hardly any comments in it (or should I say 
+        NONE!?) Reason for that is because I'm so lazy! But if you are an 
+        experienced coder it's not a hard deal to find out how it is done! 
+        For now there is no SOURCE CODE for the 3D ...Yet! I'm still doing 
+        some optimizing, but there is a demonstration for 3D too! The code 
+        is written for TASM 3.1 Ideal mode and should be translated with the 
+        /m2 option. This source code is written for 386/486 machines ONLY! 
+        and it won't therefore work on 286 or less powerful processors :-).
+                                
+                                   
+                                   Request
+                                   -------
+
+        If you liked the routines and have something to say about them,
+        it would be nice to have chat about 3D and texture mapping.
+        For now I'm trying to figure out how to do Comanche-like graphics...
+        
+        You can reach me by Internet: 
+        
+        phodju@otax.tky.hut.fi
+
+
+                                                        -Fantom
+                                                     Ultimate Brains 
+                                                        
+                                                        26.08.93
+        
+        P.S There might occur conflict between 3D-demo and QEMM memory 
+            manager, if so reset your machine and try again. You don't 
+            have to remove QEMM, because there is no protected mode used... 
+            but someday there will be!
+

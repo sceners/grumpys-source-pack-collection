@@ -1,0 +1,171 @@
+          ÉÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ»
+          º *-*-* Protracker Playing Source (PPS) v1.10 *-*-* º
+          ÈÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍ¼
+                    ³ Release Date: July 27, 1992 ³
+        ÚÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄ Shareware Version ÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄ¿
+        ³       For the sake of shareware, register it!       ³
+        ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+                  Copyright (C) 1992 Joshua C. Jensen
+
+
+                         ÄÄÄÄ Introduction ÄÄÄÄ
+
+     This is true-to-life Protracker module playing source for playing
+     Amiga modules on an IBM PC, using at least a 286, presumably 12 mhz
+     and above.  I have spent around 160 hours working on PPS, 82 hours
+     going into the commenting of it for your benefit.
+
+     All of the Protracker module playing and loading source is included
+     in this archive.  To top all of that off, a completely
+     user-supported SuperProPlay Advanced is included in its basic
+     stages, source code and all.
+
+     To the best of my knowledge, this is the only Protracker module
+     playing source code on the market.  Sure, other people have created
+     some really good module players, like WOWII by Jan Ole Suhr and
+     Promod by David L¢pez & Angel Trigo, but nothing is as good as
+     actually being able to use modules in your own programs.
+
+     Since the original release of SuperProPlay around two years ago, I
+     have always included a message saying that I'd release the source
+     code.  As of that time, there have been many people who have
+     requested that source, and I've always put the matter off saying
+     that I'd like to comment it first.
+
+     Well, you are now holding the final product in your hands.  I have
+     now thoroughly tested almost everything.  The source code works for
+     me, and it should work for you.  If you have problems, see the
+     address below.
+
+
+                          ÄÄÄÄ Disclaimer ÄÄÄÄ
+
+     As is too common in this day and age, I must include a "Notice of
+     Disclaimer".  I take no responsibility for anything you do with
+     this software or anything that is created with this software.  If
+     it ruins your life, then that is just tough, and you'll have to
+     grin and bear it.
+
+                                                Joshua C. Jensen
+
+     Please do not change and re-upload this file or the source code
+     files.  Send any corrections to me and I will incorporate any
+     corrections/changes/enhancements immediately.
+
+
+                          ÄÄÄÄ Shareware ÄÄÄÄ
+
+
+     I NEVER release programs as Shareware but always as Freeware.
+     However, when I release source code with the program, the package
+     becomes Shareware.  I do this because:  1) Hey, if you make
+     millions of dollars from a piece of software that uses these
+     routines, surely fifty dollars wouldn't be a bad investment for me
+     to further support this software.  2) I don't believe in the
+     commercial libraries that charge hundreds of dollars for the
+     libraries and hundreds of dollars more for the source code.  3) I
+     firmly believe in Shareware.  I register mine!  So should you.
+
+     Basically, we'll say this.  If you use PPS in your software, you
+     have three choices:  1) You can totally ignore the fact that I
+     wrote it and include it in your software.  I won't do anything
+     about it.  2) You can release source code with your product so
+     people can use it to learn skills in programming.  3) You can send
+     me some money (I treat this like a software package, $50 would be
+     nice) for me to use for upgrades of this package.
+
+     Obviously, if you choose choice 1, I won't be able to do anything
+     about it.  How am I supposed to know if you used the Amiga
+     Protracker source to write an IBM module player?  They would look
+     the same!
+
+     If you choose to register this software, you are entitled to the
+     following:
+
+               * Notifications of when new releases are
+                 out, and depending on how much you pay,
+                 free upgrade disks.
+
+               * A guilt-free conscience.
+
+               * Technical support.
+
+     That would be about it.  PPS is not Crippleware; it includes
+     everything that the registered version includes.  Any questions,
+     money, bugs, suggestions, etc, can be sent to:
+
+                        Joshua C. Jensen
+                        P.O. Box 414
+                        Hyde Park, UT 84318
+                        USA
+
+     Please, nobody call me collect if you happen to obtain my phone
+     number.  I'm not rich, and I won't accept the call.
+
+
+                    ÄÄÄÄ Now for the fun stuff! ÄÄÄÄ
+
+     Now that all of the above is taken care of, let me explain what is
+     going on.
+
+     SuperProPlay Advanced and the Protracker Playing Source are written
+     using Borland's TASM 2.01 and TLINK in IDEAL mode, all registered
+     trademarks of Borland International, Inc.	If you don't have Ideal
+     mode, then send me a letter.  I will convert it to MASM mode if there
+     is popular enough of demand.  I didn't include the library files
+     this time to save space in the archive.  If you'd like an assembled
+     version and don't have an assembler, contact me.
+
+     It shouldn't be too hard to convert the routines to work in another
+     language.  I have personally used the player in C and Pascal
+     programs by writing external procedures and setting up the
+     appropriate registers in these procedures.  If there is demand for
+     these routines to be written, I will include them in a future
+     release.
+
+     A manual is being prepared.  It will be professionally printed and
+     available for people to buy.  This option comes to registered
+     users.  A price is not set yet.  This manual will supply all module
+     information, technical information, equations, etc., for the
+     player.
+
+     Last, but not least (or all that is coming to mind anyway), is
+     SuperProPlay Advanced.  I decided to make this entirely user
+     supported.  If you have a change or a new feature, include it in
+     the source code and send the revised source back to me.  Don't
+     re-upload it to BBSs!  I want to maintain some degree of order with
+     this package.
+
+     The SPP Advanced source shows how many of the features work.  I
+     haven't written the instrument player in yet, but it should be
+     there the next release.
+
+     If the source code appears to look unformatted, there are lots of
+     tab characters in it.  Make sure your tabs are set to 8.
+
+     BTW, modules play in the background.  The TAB key switches
+     between the file selection screen and playing screen.  The F7 and
+     F8 keys go forward and backward in a module.  The Home key goes to
+     the beginning of the current track, the END key, the end.  The
+     F1 through F4 shut off the appropriate voice (F1 - Voice 1, etc.).
+     The F9 and F10 keys should change the Master Volume, but it has a
+     bug in it.
+
+     Thanks to all of the people who have supported this so far and
+     offered suggestions.
+
+                                       Thanks,
+                                       Joshua C. Jensen
+                                       SL8NL@cc.usu.edu
+     (NOTE: This Internet address in good through Fall quarter.  I will
+            have a new one after.)
+
+     I can also be reached at:
+           Skynet BBS     (801)753-0373     24hrs       2400 baud
+           Into the Woods (801)753-2408     24hrs       2400 baud
+                                                 IBM,Amiga,Music,Mods
+
+     P.S.  I've been looking for ages to get in with a commercial
+           software company.  Please, if any companies are interested,
+           write to me at the above address.  Thanks!

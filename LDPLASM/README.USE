@@ -1,0 +1,33 @@
+Hey dudes,I'm proud to present a pre-pre-pre beta release of the new USE (c)
+driver for the SB Pro (USE is a Trademark of AWL - Trade & Development).
+It is possible to play up to 32 (yeap,you got right,32) tracks on a 386-25
+PC at a mixing rate of up to 23000kHz.
+But,if you like it,you can play 18 FM channel syncronous.Ain't bad,hmm ?
+You think that's impossible ? It isn't.Here it is.
+But don't forget,this is only a prerelease of the new USE-driver,so don't
+wonder if there apeare some memory allocation errors or play faults.
+Additional there are problems with syncronizing the USE-driver interrupt with
+the vertical retrace,so the wait loop for this is commented in the little
+demo program.But Legend Design is working on this problem.
+I'm so sorry that there is no 50 channel test program or somethin' else but
+this is why there is no composer doin' 50 yet.But Legend Design is workin' on
+it and will release it in time.
+Additional there is a USE-driver for the normal SB but this is only a fast-
+and-dirty rewrite of the SB Pro driver and so the quality is really bad.
+Another limit is that it's no longer possible to play 50 channels (Aren't 25
+enough ?).
+But there are so many other features like realtime equalizer,changable
+dynamic and so on (equalizer means not this damned dot-puzzle on screen like
+other players do,no,this means really sound equalizing).
+All in all,I think this is a acceptable result.
+For more informations,call,write or fax to:
+
+   AWL - Trade & Development
+     Legend Design Holding
+       Am Spitzenpfad 10
+  63303 Dreieich Goetzenhain
+            GERMANY
+  Phone : (49) 06103- 87923
+  Fax   : (49) 06103-830756
+
+ PS:USE (c) is a trademark of AWL - Trade & Development and it's shareware.

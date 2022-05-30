@@ -1,0 +1,87 @@
+[ Lord Logics Landscape ]
+
+Ok, quick key list:
+
+Right/Left      - Spin landscape
+Forward/Back    - Move in current direction either forward or backward
+Space           - Move the water level up and down
+ESC             - Exit
+
+Ok, along with this file should be the following in the .ZIP you received:
+              *.INC     - a bunch of ASM include files
+           LL_1.INC     - ASM file that ties together all INC files
+              *.  H     - a few C include files
+        LL_LAND.  C     - a C program demonstrating the use of ll_land
+                          as well as the use of the keyboard and palette
+                          routines.
+        LL_LAND.EXE     - an executable version of LL_LAND
+        LL_LAND.NFO     - this great little file
+
+The method I used to calculate the x and y co-ordinates of each point as it
+is spinning around is quite simple.  We all know the 3d->2d conversion of:
+
+y = y1*d/(z1+d) + 100
+x = x1*d/(z1+d) + 160
+
+Where x,y is the screen position to draw at, x1,y1,z1 are 3d space co-
+ordinates, and d is the pixel space from the user to the screen.
+
+Before we do this little conversion, however, we must figure out x1,y1, and
+z1.  You can do this several ways.  I chose to it the best way I could 
+think of.
+
+As we know, COS and SIN work best when given an angle and multiplied
+by a vector to give a corresponding X and Y component vector.  So, in order
+to utilize this fact, we need to assign an angle THETA to each point to
+be displayed and a magnitude R.  
+
+The magnitude R is the distance from the point in question to the center of
+the displayed grid pattern.  This is given by (X^2 + Y^2) ^ 0.5.  The angle
+THETA is the angle that R makes with the vertical axis.  ie:
+
+                  1  .  .  .  . |
+                  R\ .  .  .  . |
+                  .  .\ .  .  __| Y
+                  .  .  .\ ./T. |
+                  .  .  .  .\ . |
+                  .  .  .  .  .\|
+                ----------------
+                        X
+
+For Point #1, R is the magnitude, and T is the angle THETA. In this case, 
+THETA is approximately -45degrees.  All angles, by the way, are given in 
+degrees.  I find degrees much easier to work with in integer math as you
+can divide the circle up 360 times before you need to use floating point.
+
+Anyway, once you have figured out the R and T for all display points (in
+the program LL_LAND we use a 46x46 display grid, so 46^2 points are 
+calculated) you simply do the following to rotate your image:
+
+X = R * SIN (THETA + ALPHA)  where ALPHA is the angle to rotate by. Likewise,
+Z = R * COS (THETA + ALPHA)
+Y = height at given point (value taken from data in FRACTAL.INC)
+
+What?  We use Z here?  Well, the way I looked at the axis was X is horiz.,
+Y is vertical, and Z is depth.  Since Z is depth, it corresponds to the
+Y position if you were looking at it from the top so to speak.  Anyway, Y 
+then becomes the height of the mountain.
+
+And that is basically how the display system is done.  By setting up SIN look
+up tables and all, a great deal of time is saved in the plotting routine.
+
+The method used to put up a color was simple.  Basically, whatever height
+a point has, that's what color the pixel becomes.  Before ll_land() was
+called, the palette was set up to be blue at #1, black at #0, and then
+fade from a bright green to a darker green from #2 to #63 I think, and then
+fade from a darker green to a bright white from #64 to #128 or so.
+
+-=[ Lord Logics ]=-
+ 
+Any questions or comments, please email me at:
+ketrenoj@ucs.orst.edu
+
+Oh yeah, if you have some good fast triangle code for unchained video modes
+in ASM, and you don't mind giving it out, please email me.  I need a good
+fast routine.  Thanx.
+
+

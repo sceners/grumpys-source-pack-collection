@@ -1,0 +1,21 @@
+FLAMES by M.D.Mackey
+
+  This source recreates the 'flame' effect seen at the end of the Inconexia
+demo by Iguana, but at a higher resolution. It is released into the public
+domain and may be freely modified and distributed. Acknowledgement would
+be nice if this code were actually used in anything, however :). Thanks
+to Daniel Sjoberg for info on how to set the palette (int 10h function 10h
+don't work. Probably can't get the wood, you know).
+  The code is Turbo Pascal 6.0 and inline assembler, but should be readily
+portable to pretty much anything. It's probably not really optimised:
+if anyone wants to hack around with it, speed it up, maybe even get it
+working in 320*300 at a decent rate, then by all means do so and let me have
+a copy. OK, I admit, it's very kludgy at the moment, but it's 'midnight code'
+(i.e written on the downslide from a caffeine high at 1 am), so what do you
+expect? No FLAMES, please :).
+                                                Mark.
+-----------------------------------------------------------------------------
+Mark Mackey                | "I was one of the sheep!" "Flossie?" "Yes!" "But  
+mmackey@aqueous.ml.csiro.au|  didn't we..." "Yes, Lord Melchard! Baaaaa!"
+-----------------------------------------------------------------------------
+

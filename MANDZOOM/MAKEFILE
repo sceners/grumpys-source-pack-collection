@@ -1,0 +1,21 @@
+CC	= gcc
+CFLAGS  = -Wall -O2 -m486
+OFILES = frac.o data.o palette.o bits.o lefttext.o rghttext.o zoom.o
+
+.c.o:
+    $(CC) $(CFLAGS) -c $<
+
+.S.o:
+    $(CC) $(CFLAGS) -c $<
+
+.s.o:
+    $(CC) $(CFLAGS) -c $<
+
+
+all: frac.exe
+
+frac.exe: $(OFILES)
+        $(CC) $(CFLAGS) -o frac.out $(OFILES) -lpc
+        strip frac.out
+        copy /b \gnu\gcc\bin\go32.exe+frac.out frac.exe
+

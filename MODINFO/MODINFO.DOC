@@ -1,0 +1,925 @@
+
+               MORE ABOUT MODS THAN YOU NEED TO KNOW
+
+     Hello, fellow programmers!  This is Draeden hacking out this
+info file.  When I start working on my MOD player nearly a year ago,
+I really wanted SOME piece of information on MODs.  I could find NOTHING!
+So The Kabal and I had to figure the format of a mod out ourselves.
+Needless to say, my first try was a disaster.  It worked, but not very 
+well.  (Incidently, that code is available as 'MODPLAY.ZIP' on Phantasm, and
+possibly on a local FTP site.)  Since then, I've rewritten my MOD player 
+and now it actually plays The Finn's MODs correctly (made him happy.)  
+Anyway, this DOC is intended to help out all those people who want to write 
+a MOD player (and have the skills to actually do it.)  There is quite a bit 
+of assembly required. (Har, har. A pun.)
+
+     So, far you've probably seen plenty of documentation on what
+the format of a .MOD is and what each little thingy in the .MOD format
+means.  Well, I'm going to repeat that same info, BUT it's going to
+be translated so that it's usable on the Sound Blaster AND I'm
+going to explain how to get that little card to make some noise.
+
+     On the SoundBlaster there are two ways to playback digital
+samples. The first is to directly write the sample data to the
+card MANUALLY, via a method which I call polling.  A timer
+interrupt must be set up to go off FOR EACH BYTE PLAYED.
+(Usually around 12,000 times a second.)  This, of course, eats up
+a lot of processor time and causes the program that's playing (ie. a
+demo/game) to be VERY SLOW.  The advantage to this method is that you
+can do playback on a large variety of equipment (ie. PC speaker,
+Adlib, DAC converters , Covox, or whatever...)  See  the included file
+"POLLPLAY.ASM" for an example of how to do that type of playback.
+If you have a LPT DAC, see "DACPLAY.ASM"  I won't spend too long talking
+about it- it's pretty strait forward and simple.
+
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+Here's a quick outline of what you have to do (for SB poll mode):
+
+ 1) Set up your interrupt (int 8, the timer)
+ 2) Reset the DSP, Turn on the speaker
+ 3) Turn the Timer interrupt on and program it
+
+ 4) ...Do your stuff... (sound is playing, now)
+
+ 5) Turn off the speaker
+ 6) Shut off the timer interrupt
+ 6) Restore the old interrupt
+
+Your interrupt must do this:
+
+ 1) Get the next byte to be played
+ 2) Play it
+    a) for the soundblaster send the command 10h, then the byte
+ 3) Acknowledge the interrupt
+
+And that's all there is to it!  See POLLPLAY.ASM for specifics.
+See DACPLAY.ASM for a more general setup.
+
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+ 
+     The other (and much preferred) way is through the DMA.  This
+is the quickest way to do digital playback on the SoundBlaster. 
+The only drawback is that it is quite a bit more complicated
+than the polling method.  You have to set up the DSP then set up
+the DMA, set up an interrupt, break down the playback buffer into
+sections that don't cross the page boundary, etc...  It's pretty 
+complicated, but well worth the effort.  See the included
+"DMAPLAY.ASM" for an example on how to do that.  See "DMAPLAY2.ASM" for 
+the Sound Blaster PRO stereo version.  Note that for stereo, every other
+byte is on a different channel.  Odd bytes are, say, on the left speaker,
+while even bytes play on the right.
+
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+Here's what you must do for DMA playback:
+
+ 1) Reset DSP, Turn on speaker, set time constant (256 - 1000000/HZ)
+ 2) Break sample into two buffers, if necessary.
+ 3) Program the DMAC (8237) for the DMA operation.
+ 4) Program DSP for DMA transfer.
+
+ 5) ...Up to you...
+
+ 6) When DMA is finished (interrupt occurs) you can either play another
+    buffer (repeat steps 3 & 4) or do nothing but acknowledge the interrupt.
+ 7) Restore old interrupt.
+ 8) Turn off speaker.
+
+Your interrupt must do this:
+
+ 1) If you are to play no more, set a flag saying so and goto 3
+ 2) Set up to play another buffer..
+ 3) Acknowledge the interrupt
+
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+     To play back a MOD, which is just one big sample (which your
+program  creates on the fly), you need to use a method which is
+known as "DOUBLE BUFFERING."  This should make sense.  When you
+create the "sample" or part of  the MOD to be played, you use up
+a few microseconds of processor time.  In the DMA playback, an
+interrupt occurs at the end of each block that is played.  If you
+were using one buffer, then you would have to update that buffer as
+soon as it was finished.  This would cause a noticeable click or
+pause in the playback.  Obviously, this is not exactly what one
+desires.  If you were using two buffers, the interrupt would, as
+soon as the previous buffer is played, start playing  the other
+buffer.  And then it can take it's sweet old time updating the
+first buffer.  This cycle would repeat indefinatly, or until the
+MOD is stopped.  A simple concept, but not all that simple to do.
+
+     Anyway, so you have your two buffers.  You can play the two
+buffers  continuously.  So now all that's left is to actually
+create the sample to play.  Before I explain how you would go
+about this, we need to review some physics of sound.  First thing
+you must know is that when two sounds are played at the same time
+they add together.  So if you were to play two samples at the
+same  time you would simply add the individual bytes together and
+that would be the sample that you play.  For instance, lets
+suppose that we wanted to mix the  following two "samples" 
+
+Sample1:   0  0  23  45 67 78 77 55 44 33 22 11  0
+Sample2:  10 88   4  91  4  3 17 21 23 10 12 40 80
+RESULT:   10 88  27 136 71 81 94 76 67 43 34 51 80
+
+     You would then play the RESULT sample and it would sound
+like the two samples were played at the same time.  See
+"MIXPLAY.ASM" which takes two samples and mixes them and then
+plays the result via POLLING.  Unfortunately, digital sound is
+limited.  The sound blaster is only 8 bit.  What would happen if you
+mixed two samples that had the values 128+130 = 258 (= 3 in 8 bits)?  
+That result would cause a crackle in the sound and would generally
+make the playback sound like crap.  Again, that is not desirable. 
+Suppose now that you mixed FOUR samples together (ie four traks of a MOD.) 
+The maximum value that each sample could have is 64 (64*4=256),
+because you cannot allow the possibility of it exceeding the 8 bit
+range.  (In SAM format, this would translate to a +-32 range for each
+sample.)  Conveniently, 64 is the maximum volume for each sample in a MOD.
+Even so, don't forget that the range of the sample data is -128 to 127.
+
+     Volume in sound, is simply the magnitude of the sound wave. 
+The bigger the range, the more air is displaced, the louder it can
+get.  (Or something like that...)  Since the maximum volume of a sample
+is 64, you can derive this formula for mixing the samples together:
+
+result = (S1*V1 + S2*V2 + S3*V3 + S4*V4)/256
+
+     The /256 is because we want the result to have a range of +-128
+and each individual sample has a max of +-128 and the volume multiplied
+and added for 4 traks give a maximum value of 4*64*(+-128) = 256*(+-128)... 
+I think you can figure that one out on your own.  This is VERY 
+convenient in assembler, because all you have to do for each 
+byte in the sample is this:
+
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+     mov  al,[es:di]      ;es:di points to sample data
+     imul [Volume]        ;volume * sample data
+     add  [ds:si],ah      ;add the upper 8 bits
+                          ;ds:si point to the RESULT buffer
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+     Pretty simple, eh?  That's all there is to the mixing part. 
+Now you  might wonder how to get the different frequencies. 
+This, again, is pretty  simple.  To lower the frequency you would
+do just that- lower the frequency (stretch it out).  This is done 
+by increasing the "sample source" pointer by a value less than one. 
+For instance, if you were to step through this "sample" with a
+step of 1/2, you would get the following result:
+
+Sample: 1 2 3 4 5 6 7 8 9 0
+RESULT: 1 1 2 2 3 3 4 4 5 5 6 6 ...etc...
+
+     This stretches out the sample, therefore lowering the
+frequency.  Similarly, to raise the frequency, you would use a
+step that is greater than one. In example, using the same sample
+above, but with a step of 2, you'd get:
+
+RESULT: 1 3 5 7 9
+
+     To effectively do this stepping stuff, you need "floating
+point" numbers.  The easiest way to do floating point numbers
+with integers is using what I call the integer part and the
+"precision."  For instance, the value of 1 and 1/2 would have as
+the integer value a "1" and (10000h / 2) for the precision.  This
+is very convenient on the 386, because you can take advantage of
+the 32 bit numbers.  For instance, to increase the pointer DI by
+an amount stored in EBP (Low BP=precision HIGH= integer) you'd
+simply do this:
+
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ     
+     ROR EDI,16    ;restore to a proper 32 bit number
+     ADD EDI,EBP   ;add the step
+     ROR EDI,16    ;put the low high and the high low..
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+     In this example, DI is a pointer like usual, but in the
+upper 16 bits, the precision is held.  EBP is just a normal 32 bit
+number with "1"=10000h. You may at first think,"why not just
+store EBP backwards, like EDI."  But clearly this would not work,
+because when the precision overflows, the Integer part would not
+be increased.  You would have a pointer that would never move or
+increase by an integer amount (if EBP > 0FFFFh)
+
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+-More examples of integers representing floating pt numbers-
+           
+            High  Low
+    
+    0.125=       2000h
+    0.25 =       4000h
+    0.5  =       8000h
+    1.0  =     1 0000h
+    1.5  =     1 8000h
+    2.0  =     2 0000h
+               ^  ^
+               |  Precision part
+              Integer part 
+
+    Add:      
+              1.5 + 0.25  = 1.75
+           18000h + 4000h = 1c000h
+
+    Multiply:
+              1.5 * 2.0    = 3.0
+           18000h * 20000h = 300000000h/10000h = 30000h
+      (Don't forget to divide by '1' after multiplying)
+
+    Divide:
+              4.0 / 3.0    = 1.333...
+    40000h*10000h / 30000h = 15555h
+      (Don't forget to multiply by '1' before division)
+
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+     Now, the tough part.  How do you find the step value?  Well,
+the step is based on two things-
+
+ 1) the note being played and
+ 2) the sampling rate
+
+     How you go about calculating the step is like this: you
+take a value proportional to the sampling rate and divide it by
+the NOTE frequency.  There is probably some really simple
+mathematical equation for figuring out precisely what the value
+should be, BUT I haven't spent time to figure it out.  All you
+know is that it is linearly proportional to the sampling rate, so
+you just have to play with different count values until you get
+one that sounds right, and then you can  figure out a relationship
+from there.  Here are some values for the count that  have worked
+for me:
+
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+  COUNTTBL DD 1C78000H      ;8000  HZ
+      DD      16C8000H      ;10000 HZ
+      DD      12FC000H      ;12000 HZ
+      DD      1045B00H      ;14000 HZ
+      DD      0E3D000H      ;16000 HZ
+      DD      0CA8000H      ;18000 HZ
+      DD      0A5AE00H      ;22000 HZ
+
+  Just in case you are wondering how the step calculation would look in 
+assembler...
+
+MACRO @FigureStep     ;in: ebp = Note   out: ebp = step
+    push    edx
+    mov     eax,[Count]
+    xor     edx,edx
+    div     ebp
+    mov     ebp,eax
+    pop     edx
+ENDM  @FigureStep
+
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+     That information in itself is nearly enough for you to write
+your own MOD player.  Now I'll talk about how to read and process
+the notes.  First off, a brief reminder about how each note is set up:  
+(This is all in hex for convenience.  My convenience.)
+
+BYTE#       1  2   3  4
+         ÚÄÄÄÂÄÄÂÄÄÄÂÄÄ¿
+         ³0 0³00³0 0³00³
+         ³S NOTE³S C³XY³
+         ³H  ³  ³L  ³  ³
+         ÀÄÄÄÁÄÄÁÄÄÄÁÄÄÙ
+
+ş SH and SL are the high and low parts of the Sample number. 
+Currently, in the MOD format, only the lowest bit of the High
+sample is used. 5 bits = 31 possible samples (0= NULL sample, so
+the real range is 1-31).  
+
+ş NOTE is the 12 bit note frequency.  If you hit a freq = 0,
+  DON'T RECORD THAT FREQUENCY. (Nobody likes to divide by zero...)
+ş C is the special command.
+ş X & Y are the arguments for the command.
+  The special commands are recorded even if they are all 0's
+
+Suppose now that [fs:si] pointed to the current note, you'd grab
+everything like this:
+
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+     mov ah,[fs:si]
+     and ah,4
+     mov al,[fs:si + 1]
+     mov [Frequency],ax   ;get the frequency
+
+     mov al,[fs:si]
+     shr al,4
+     and al,1             ;we only want one bit
+     mov ah,[fs:si + 2]
+     shr ah,4
+     or  ah,al            ;combine low & high
+     mov [Sample],ah      ;store the sample number
+
+     mov al,[fs:si + 2]
+     and al,00001111b     ;grab the command
+     mov [Command],al
+     mov ah,[fs:si + 3]
+     mov [CommandXY],ah
+     mov al,ah
+     and al,00001111b     ;isolate the Y part
+     shr ah,4             ;isolate the X part
+     mov [CommandX],ah
+     mov [CommandY],al
+
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+     I stored the command arguments both separately and together
+because some commands need to access them as a whole, some want
+them separate.  This was pseudo code.  While it WOULD work, this
+is NOT the way to do it.  The best way is to have 4 records that
+have all the fields you need for each trak in them.  For example,
+here's most of the record that I used in my newer MOD player:
+
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+STRUC Trak
+
+    Enabled     db  0       ;0= trak is not valid: other= play it
+    Delayed     db  0       ;0= not delayed, 1= sample is delayed
+    SpecialOn   db  0       ;0= no special, other yes
+
+    sSeg        dw  ?       ;sample segment
+    sOff        dw  ?       ;sample offset
+    sLoopS      dw  ?       ; sample loop start
+    sLoopLen    dw  ?       ;lenght of loop
+    sEnd        dw  ?       ;ending offset of sample
+    sFreq       dd  ?       ;sample frequency (step)
+    sTFreq      dw  ?       ;temporary step value
+    sVolume     db  ?       ;volume
+    sInst       db  ?       ;the inst currently playing
+                
+    Note        dw  ?       ;the frequency, not the step value
+    LastNote    dw  ?       ;the last real note played..
+    cmd         db  ?       ;command (0-15)
+    cmdX        db  ?       ;upper 4 bits of the XY
+    cmdY        db  ?       ;lower 4 bits..
+    cmdXY       db  ?       ;all 8 put together (XY)
+    FineTune    db  ?       ;amount shifted up or down..
+    Start       dw  ?       ;offset of beginning of sample (for retrigger)
+    
+    ArpeggStep  db  ?       ;either 0,1, or 2
+    WantedNote  dw  ?       ;used to slide to a specific note
+    VibratoCmd  db  ?       ;speed & Depth for Vibrato
+    VibratoPos  db  ?       ;position in wave chart
+    VibNote     dw  ?       ;base note for vib
+    TremoloCmd  db  ?       ;speed & depth for Tremolo   
+    TremoloPos  db  ?       ;position in wave chart
+    TremVol     db  ?       ;base volume
+    
+    ...           ;feel free to add more stuff as you need 'it!
+
+ENDS  TRAK
+
+TheTraks    Trak   4 dup (<>) ;declare variables for the traks
+
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+     The easiest way to process the commands would be to use a
+"jump table." A jump table is simply a list of offsets to various
+places in your program.  It is a much faster than doing:
+
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ     
+     cmp    [Cmd],0   ;is it arpeggiation?
+     je     DoArpeg
+     cmp    [Cmd],1   ;is it freq slide?
+     je     SlideFup
+     ...
+     ...     ;etc.
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+A jump table would look like this:
+
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+InitTable dw offset InitArpeg, offset InitSlideUp, offset InitSlideDn         
+          dw offset ...  etc.. for all 16 commands..
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+You would use the jump table like this:
+     
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+PROC InitCommands 
+     pusha
+     movzx  si,[cs:Cmd]
+     add    si,si                     ;multiply by 2 (for word sized data)
+     jmp    [word cs:si + InitTable]
+ReturnFromInit:
+     popa
+     ret
+ENDP InitCommands
+
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+     Of course, all of your little subroutines would have to, at
+the end of  them, return to the label ReturnFromInit by jumping
+to that location.  If you are wondering why I Put INIT infront of
+all the labels, then you are in luck  because I am going to tell
+you.  Most of the Commands require some code to initialize them,
+and then some of them require to be updated with each "tick" of
+the timer.  So you'd also have to do a jump chart for Update commands.
+Also note that you'll need two more jump charts for the Extended
+commands... A total of four jump charts.
+
+     Song Speed: the timer "ticks" 50 times a second.  The song
+speed is  simply the number of ticks before a new note is
+processed.  The commands need to be updated with every tick.  The
+actual timing of the song can be achieved by the size of the
+buffer.  For convenience, I chose the buffer size to be equal to
+the duration of one note. For example, suppose I had a sampling
+rate of 22,000 hz.  That means that 22,000 bytes are played every
+second.  So, to  find the number of bytes in 1/50 of a second,
+you just divide the HZ by 50. This gives you the number of bytes
+in a tick.  The buffer size would then be equal to: 
+
+        BufferSize = BytesPerTick * Songspeed.  
+                   = 22000/50 * 6 (default speed is 6)
+                   = 2640
+
+Very simple.  But you have to allow the buffer to
+grow bigger (say a max of 31 ticks) this would mean that the
+MaxBufferSIze would be (if your max sampling rate was 22000):    
+
+     22000/50 * 31( or 1Fh) = 13640 bytes
+     
+     This, of course means that 27280 bytes (=2*13640, 2 buffers)
+need to be set aside in memory (dynamically allocated, right?)
+for the playback buffers.
+
+     More on song speed: speed values 20h-FFh are what's known
+as BPM speeds (Beats Per Minute.)  Very annoying, but they are 
+incredibly easy to implement (not as easy as a simple speed change,
+though).  What you'll end up doing is resizing the playback buffer,
+which may mean that the BufferSize != BytesPerTick * SongSpeed.
+
+     The new songspeed will be equal to: 750/BPM.  The 750 came from 
+there being 50 ticks per second * 60 seconds per minute = 3000 ticks/min.
+Each 'note' is regarded as a quarter note, so 3000/4= 750.  So, in summary:
+
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+SongSpeed = 750/BPM             ;will give you the integer speed approx
+Buffersize= 750 * BytesPerTick / BPM
+
+NOTE: The Buffersize MAY be bigger than BytesPerTick*SongSpeed, so you must
+    use the size of the buffer to indicate the end of the note, NOT a count
+    of how many ticks were done.
+
+ Some BPM's of some songspeeds:
+SPEED   BPM     The BPM is calculated by BPM = 750 / Speed
+
+  4     187
+  5     150
+  6     125
+  7     107
+  8      93
+  9      83
+ 10      75
+ 11      68
+
+ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
+
+Ok, here's the actual .MOD format...
+
+    POS = Position in file (in hex)
+    LEN = Length in bytes (in hex)
+    Description = The jello to mass ratio of a frog (in hex)
+
+POS     LEN     DESCRIPTION
+
+0000    0014    Mod name. Should be a ASCIIZ string, but you never know.
+0014    03A2    Sample data (see the below structure "SampleStruc")
+03B6    0001    Number of Valid sequences.
+03B7    0001    Says if the mod is to be restarted. Ignore it. Not reliable.
+03B8    0080    The sequences. All 128 of 'em.
+0438    0004    The initials "M.K."  You could, if you really wanted to, 
+                verify that the file is a MOD by looking at this signature.
+
+043C    0400    The patterns. Each is 1024 bytes long, but you have to figure
+                out how many there are by finding the MAXIMUM of all the
+                pattern #'s in the sequence list. Then you add 1. (0 is a
+                valid pattern.)
+
+????    ????    Immediately after the last pattern, the samples begin.
+                You have to read them in in order.  The size is in the 
+                header.
+
+------- -------
+
+        Here's the structure you'd use for each sample:
+
+STRUC SampleStruc
+  Name        db  22 dup (?)
+  Length      dw  ?
+  FineTune    db  ?
+  Volume      db  ?
+  LoopStart   dw  ?
+  LoopLength  dw  ?
+ENDS  SampleStruc
+
+NOTE:   The Lenght, LoopStart, LoopLength are, by IBM standards, screwed up.
+        They are stored in the AMIGA format (BIG surprise...) which means
+        that instead of the LOW byte being first in memory, the HIGH byte is
+        first.  You need to switch them.  Those values are also a measure of
+        how many WORDS long the sample is. (Multiply by 2 to get # of bytes.)
+
+FINETUNE:
+        The fine tune is only a signed NIBBLE! You fix it into a signed byte
+        by doing this:
+
+        SHL     [Sample.Finetune], 4
+        SAR     [Sample.Finetune], 4
+
+    The AMIGA Guru's say that finetuning is done by multiplying the frequency
+(the note) by X^(-finetune) where X = 1.0072382087. I  say, shaw, right!  
+Like I'm going to do that!  I say do this:
+
+    note= note - note*2*finetune/256    ;this is pretty accurate
+
+OR, if you are REALLY lazy, do this:
+
+    note= note - 6*finetune     ;this ONLY works for the lower tones
+                                ; but who cares!?  It's close enough to 
+                                ; fool most people...
+
+    This finetune adjustment must be made each time a note is changed.
+
+VOLUME: This value SHOULD be between 0 and 64. Make sure it is.
+
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+    So, the easiest way to load in the header is to create a header and
+load in the first 043Ch bytes right into it.  Then you can do your stuff!
+
+MODHEADER:
+        SongName    db        20 dup (0)
+        Samples   SampleSTRUC 31 dup(<>)
+        NumSequence db        0
+        Restart     db        0
+        Sequences   db        128 dup (0)
+        TheMKSig    db        "M.K."       ;the "M.K." signature
+        
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+                           FORMAT OF THE PATTERNS
+
+    The patterns are just 64 "events".  Each "event" is made up of four
+notes.  These four notes are made up of 4 bytes. 64*4*4=1024 bytes total.
+
+Format of a NOTE:  This appeared a ways back, but heck, do you want to look
+ALL the way up there again?
+
+BYTE#       1  2   3  4
+         ÚÄÄÄÂÄÄÂÄÄÄÂÄÄ¿
+         ³0 0³00³0 0³00³
+         ³S NOTE³S C³XY³
+         ³H  ³  ³L  ³  ³
+         ÀÄÄÄÁÄÄÁÄÄÄÁÄÄÙ
+
+ş SH and SL are the high and low parts of the Sample number. 
+Currently, in the MOD format, only the lowest bit of the High
+sample is used. 5 bits = 31 possible samples (0= NULL sample, so
+the real range is 1-31).  
+
+ş NOTE is the 12 bit note frequency.  If you hit a freq = 0,
+  DON'T RECORD THAT FREQUENCY. (Nobody likes to divide by zero...)
+ş C is the special command.
+ş X & Y are the arguments for the command.
+
+    You'd index the correct "event" (I don't know what it's called..)
+by doing something like this:
+
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+    mov     si,[CurPattern]
+    shl     si,10           ;multiply by 1024
+    mov     ax,[CurNote]
+    shl     ax,4            ;multiply by 16
+    add     si,ax           ;si points to the correct set of notes.
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+Here's the list of protracker commands... As you might guess by the credits
+below, I did not write this...
+
+ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
+
+Protracker V2.3A/3.01 Effect Commands
+----------------------------------------------------------------------------
+0 - Normal play or Arpeggio             0xy : x-first halfnote add, y-second
+1 - Slide Up                            1xx : upspeed
+2 - Slide Down                          2xx : downspeed
+3 - Tone Portamento                     3xx : up/down speed
+4 - Vibrato                             4xy : x-speed,   y-depth
+5 - Tone Portamento + Volume Slide      5xy : x-upspeed, y-downspeed
+6 - Vibrato + Volume Slide              6xy : x-upspeed, y-downspeed
+7 - Tremolo                             7xy : x-speed,   y-depth
+8 - NOT USED
+9 - Set SampleOffset                    9xx : offset (23h -> 2300h)
+A - VolumeSlide                         Axy : x-upspeed, y-downspeed
+B - Position Jump                       Bxx : songposition
+C - Set Volume                          Cxx : volume, 00-40
+D - Pattern Break                       Dxx : break position in next patt
+E - E-Commands                          Exy : see below...
+F - Set Speed                           Fxx : speed (00-1F) / tempo (20-FF)
+----------------------------------------------------------------------------
+E0- Set Filter                          E0x : 0-filter on, 1-filter off
+E1- FineSlide Up                        E1x : value
+E2- FineSlide Down                      E2x : value
+E3- Glissando Control                   E3x : 0-off, 1-on (use with tonep.)
+E4- Set Vibrato Waveform                E4x : 0-sine, 1-ramp down, 2-square
+E5- Set Loop                            E5x : set loop point
+E6- Jump to Loop                        E6x : jump to loop, play x times
+E7- Set Tremolo Waveform                E7x : 0-sine, 1-ramp down. 2-square
+E8- NOT USED
+E9- Retrig Note                         E9x : retrig from note + x vblanks
+EA- Fine VolumeSlide Up                 EAx : add x to volume
+EB- Fine VolumeSlide Down               EBx : subtract x from volume
+EC- NoteCut                             ECx : cut from note + x vblanks
+ED- NoteDelay                           EDx : delay note x vblanks
+EE- PatternDelay                        EEx : delay pattern x notes
+EF- Invert Loop                         EFx : speed
+----------------------------------------------------------------------------
+Peter "CRAYON" Hanning /Mushroom Studios/Noxious
+
+ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
+
+    Now into the implementation of all those little commands...
+
+ARPEGGIO:
+    You just step between 3 notes: note, note + x, note + y
+    Don't forget to recalculate the step value after changing the note.
+
+SLIDES:
+    For up, the value XY is subtracted from the NOTE on each tick.
+    Down, you add.. Keep the values within the range 83-832.
+
+SLIDE TO NOTE:
+    The note that is currently in the NOTE field is what you are sliding to.
+    You must keep a backup of the last note so that you know where you are
+    sliding from.  Add or subtract XY on each tick so that you move closer
+    to the note.
+    - If the NOTE field = 0, you are supposed to continue sliding to the
+      last note specified
+    - I think that if the XY field = 0, that you are just supposed to
+      continue whatever slide was last active at the last speed specified.
+
+VIBRATO:
+    For this, you need a chart of a sine wave, square wave, and something
+    called "ramp down."  The maximum value in this chart should be 255, the 
+    minimum -255.  One half period in the sine wave should be 32 entries.
+    That would mean you have a total of 64 entries, half negative, half not.
+    On each tick you increase the index into the chart by X (the speed).
+    You grab the value there and multiply Y (the depth) by that value and
+    divide by 256.  You then add that value to the BaseNote and recalculate
+    the Step.
+        Note that you must, upon initializing, grab all the info you need,
+    (note & XY) because this continues until a new note is put in.  It also 
+    has to work with volume slides.
+    - If the XY field = 0, you are supposed to continue whatever vibrato
+      was last active.  I'm also pretty sure that you are not supposed to 
+      reset the index every time a vibrato is called.
+
+
+NOTE SLIDE + VOLUME SLIDE:
+    For the INIT, you just call the InitVolume subroutine (this is the only
+    on that needs it's own subroutine, other than glissando.)
+    To update, you call the UpdateVolume subroutine and then jump to the
+    Slide to NOTE routine.
+
+VIBR + VOLUME SLIDE:
+    Same as above.
+
+TREMOLO:
+    Same as Vibrato, but instead of changing the NOTE, you change the volume.
+    You can use the same charts.
+
+VOLUME SLIDE:
+    Upon initializing, you want to see if its an up slide or a down slide and
+    then extend that nibble out to a signed byte (ie. 04 => -4, 40 => 4.)
+    On each tick, you add that value to the volume.  Be sure to keep the 
+    volume within the range 0-64.
+
+POSITION JUMP:
+    Remember that you are jumping to a sequence and not a pattern.  Otherwise
+    this is darn simple.
+
+SET VOLUME:
+    Gee, I don't know...
+
+PATTERN BREAK:
+    Set the current note to 64, so that on the next update, it wraps around
+    to the next sequence.
+
+SET SPEED:
+    You must calculate both the SONGSPEED and the BUFFERSIZE.
+    If the XY <= 1Fh then that's easy, you just use that value as the song
+    speed and use BUFFERSIZE = SongSpeed * BytesPerTick.
+
+    For BPM, do it the way I suggested a couple pages ago...
+
+            EXTENDED COMMANDS:
+
+SET FILTER:
+    Yeah, right.  As if the SB had a filter!
+
+FineSlide Up/Down:
+    Add/subtract the x value to/from the NOTE. Recalculate the step.
+    This is done ONCE upon initialization.  No update routine is needed.
+
+Glissando:
+    This is really a luxury.  You don't have to implement it. 
+    But, if you want to, you do it like this...
+
+    1) Create a chart of all the possible WHOLE notes (exclude sharps, flats,
+        etc...)
+    2) Slide the NOTE up or down like normal, but if Glissando is on, you
+        have to look up your adjusted note in the chart and round to the
+        nearest one.  I suggest that you don't save this rounded off note, 
+        but just use it to calculate the step.
+
+Set Vibrato Waveform:
+    Currently, there are 3 possibilities, sine, ramp down, and square wave.
+    You might want to implement this by making the Vibrato reference the 
+    chart indirectly.  That way you just load in the offset to the chart
+    into the VibratoChart variable.  And that's it.
+
+    example:
+        ...
+        mov     si,[VibIndex]       ;grab the index
+        add     si,si               ;multiply by 2 (word sized data)
+        mov     bx,[VibratoChart]   ;get the offset to the current chart
+        mov     ax,[si+bx]          ;grab the value
+        ...
+
+Set Loop:
+    You just have to store the current position in the pattern.
+
+Jump to Loop and play:
+    This is one that you'll just have to figure out yourself...
+    It's probably the toughest one to implement... :)
+    The second part of Set Loop.
+
+Set Tremolo Waveform:
+    Same as for Vibrato.
+
+Retrigger Note:
+    When the current Tick = x then reload the start offset into the current 
+    source pointer.  That means that you must keep track of what current
+    tick you are on.
+
+Fine Vol slide up:
+    Add this value to the volume on initialization. No update.
+
+Fine Vol slide down:
+    Subtract this value from the volume on initialization. No update.
+
+NoteCut:
+    At tick x, terminate the sample. (set ending offset = 0 or something)
+
+NoteDelay:
+    Set the delay flag on init.  Your mixer routine should have an extra
+    loop that will wait until the delay flag is off (and call UpdatePro)
+    Turn off the flag when Tick = x
+
+PatternDelay:
+    Just another one of those thing.  Put the delay flag in front of your
+    "grab the note" routine.  Don't grab any notes until the delay is zero.
+
+    Example:
+
+    PROC ReadAllTheNotes NEAR
+        cmp     [PatternDelay],0
+        je      ReadTheNotes
+        dec     [PatternDelay]
+        ret
+    ReadTheNotes:
+        ... 
+        
+Invert Loop:
+    To be honest, I haven't a clue.  I've never seen a MOD that uses it.
+
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+    OK, for those who still aren't exactly sure how to do this update thing,
+I've included the routine that I use to actually mix the data.  The buffer
+was already cleared to 128's.  Note that this routine is called 4 times, 
+once for each trak.  The segments were pushed in the main routine.
+
+ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
+
+    ;IN: BX = (Trak to update) * (size TRAK)
+PROC    UpdateTrak  ;called to update the traks
+    pushad
+    mov     ax,cs
+    mov     ds,ax
+    mov     ax,[BufferSeg]
+    mov     es,ax
+
+    mov     ax,[BytesPerTick]
+    inc     ax
+    mov     [BPTCounter],ax
+    mov     ax,[SongSpeed]
+    mov     [TickCounter],ax
+    mov     [CurTick],0
+
+    mov     si,[CurOff]             ;es:si is pointer to buffer
+    mov     cx,[CurBuffSize]        ;TmpCurBuffSize is the length
+    inc     cx
+    mov     [TmpCurBuffSize],cx
+
+    mov     fs,[bx + TheTraks.sseg] ;fs:di is pointer to Sample data
+    xor     edi,edi
+    mov     di,[bx + TheTraks.soff]
+    mov     cx,[bx + TheTraks.send] ;cx is ending offset of sample
+    mov     ebp,[bx+ TheTraks.sfreq]    ;step for note
+    mov     dl,[bx + TheTraks.svol] ;dl is volume
+
+@@DelayedLoop:
+    cmp     [bx + TheTraks.sdelayed],0
+    je      @@TheLoop           ;check if we are delaying this trak...
+    mov     ax,[BPTCounter]
+    add     si,ax
+    sub     [TmpCurBuffSize],ax
+    jbe     @@EndOfUpdate
+
+    call    ProTrackerUpdate
+
+    inc     [CurTick]
+    jmp     @@DelayedLoop
+    
+@@TheLoop:
+    mov     al,[fs:di]
+    imul    dl
+    add     [es:si],ah      ;do one byte of the sample
+    
+    ror     edi,16          ;increase the pointer
+    add     edi,ebp
+    rol     edi,16
+    cmp     di,cx
+    ja      @@HandleEndOfSample
+
+@@BackFromEOS:
+    inc     si
+    dec     [TmpCurBuffSize]
+    je      @@EndOfUpdate
+    dec     [BPTCounter]
+    jne     @@TheLoop
+
+    call    ProTrackerUpdate
+
+    mov     ax,[BytesPerTick]
+    inc     ax
+    mov     [BPTCounter],ax
+    inc     [CurTick]
+    jmp     @@TheLoop
+
+@@EndOfUpdate:
+    mov     [bx + TheTraks.soff],di
+    mov     [bx + TheTraks.send],cx     ;cx is ending offset of sample
+    mov     [bx +TheTraks.sfreq],ebp    ;step for note
+    mov     [bx + TheTraks.svol],dl     ;dl is volume
+
+    popad
+    ret
+    
+@@HandleEndOfSample:
+    cmp     [bx + TheTraks.slooplen],0
+    jne     @@DoARepeat
+    mov     [bx + TheTraks.sEnabled],0  ;disable the track
+    jmp     @@EndOfUpdate
+@@DoARepeat:
+    mov     di,[bx + TheTraks.sloops]   ;start of loop
+    add     di,[bx + TheTraks.Start]
+    mov     cx,[bx + TheTraks.slooplen]
+    add     cx,di                       ;set up ending address
+    jmp     @@BackFromEOS
+
+ENDP    UpdateTrak
+
+ÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ
+
+    Ok, all that's really left is the writing of a load subroutine and of 
+the routine that reads and processes the notes.  And, of course, you need to
+implement all of those cute little ProTracker routines.  And, well, you need
+to fix up the DMA driver...  Geeze, there sure is a lot to a MOD player, 
+isn't there?  Probably why not everyone has written one. :)
+
+ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+
+    Well, that's about all...  This info is enough to get ANY competent
+programmer started making a MOD player...  I hope you enjoyed this little
+info file.
+
+   ş Draeden - VLA - Main Coder
+
+Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿
+ÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙ
+
+       You are free to use all code in the associated files ( DMAPLAY.ASM,
+    DMAPLAY2.ASM, POLLPLAY.ASM, MIXPLAY.ASM, DACPLAY.ASM, MODINFO.DOC ) on
+    the condition that you greet VLA in your future releases.  A kind word
+    about how you appreciate files like this wouldn't hurt either. :)
+
+                See VLA.NFO for information on contacting us.
+
+Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿Ú¿
+ÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙÀÙ

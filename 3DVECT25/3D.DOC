@@ -1,0 +1,275 @@
+    3d Vectors Source
+
+     by John McCarthy (with a little help from his mommy)
+        1316 Redwood Lane
+        Pickering, Ontario, Canada
+        L1X 1C5
+
+       (416) 831-1944 (voice, always willing to talk, but do not call at 2am)
+
+    documentation is in  no  defined  order. sorry, i just  sorta  lumped  my
+    ideas together and ended up with this file.
+
+    routines support any  x mode, - but  page  flipping  is  not  allowed  in
+    resolutons which allow only 1 page - see "pages" constant.
+
+    full clipping is  performed  to  user  defind  areas - see  constants  in
+    equ.inc. they have   been   changed  to  memory  locations  for  variable
+    windowing or multiple screens.  for  windowing,  the last z locations for
+    that window must be remembered along with a slew of other  locations, see
+    vars.inc for that  info.  to change a window, save the lastz information,
+    reset with old lastz information and  then  call  set_clip  to change the
+    border clipping and screen center data.
+
+    the theoretical screen  is  considered  to be (x,y) with  0,0  being  the
+    center of the  screen!.   so  -100,-100  is  somewhere  on  the top left!
+    actual screen goes from (0,0) to (320,200)  -  or  whatever mode size you
+    select.  Matt Pritchard's routines (xmode.asm) assume  0,0  to be the top
+    left of the  screen  while  my routines (me = John = 3d.asm) consider the
+    screen center to be the constants xcenter and ycenter.
+
+    visible space is  -4628196  to +4628196  on  all  axis  (approx).  object
+    locations are 32 bit, vector routines are 16 bit, objects must be smaller
+    than 16 bit but are visable within about a 32 bit range.   (4 million, as
+    it is now,  is  very  very  far).   since the camera is always at (0,0,0)
+    (relative), objects with (relative) negative z values are not seen.  this
+    cuts the z space to 0 to 4mil.  visible space is always divided by 256 so
+    decimals can be allowed in adding, and  moving of objects.  visible space
+    therefore, is actually  from -1.024 billion to +1.024  billion  with  the
+    lower byte having  no effect on the location.  non-visible space is where
+    objects can be but won't appear on screen.   this space is a 256 *256*256
+    cube.  to racap:  you have 32 bit x,y,z axis with a visual  range  of  28
+    bits, where the  lower  8  bits don't affect the location.  (lower 8 bits
+    don't count because locations are shr'ed)   i  say that the visable space
+    is "about" 4mil only because of the code in the make3d routine: this code
+    multiplies by a  constant  and then performs divide by  z  distance.   we
+    cannot allow the  multiply  to  overflow  and  therfore must truncate our
+    maximum distance to prevent this.  the  constants  for multiplication are
+    the screen ratio constants and the calculation to test for an overflow is
+    as such -2^32/2/256/(largest constant).  the constant I  have used is 464
+    for the y  ratio.   I  have  used  this  because  of my desire to use the
+    320x400 mode resolution.  therfore, 4.3gig/2/256/464  = about 4 million -
+    our maximum visual  distance.  like, trust me, you don't  really  need  a
+    larger universe.  fixing  the  make  3d  routine  wont  allow  you to see
+    farther because then you would have to fix the rotate routine, etc, etc.
+
+     when defining a location: ebx = x, ecx = y, ebp = z
+     when defining a rotation: x = pitch, y = heading, z = yaw
+     si refers to object number, di refers to time.
+
+     rotations occure in order:
+     zobject,xobject,yobject,ycamera,xcamera,zcamera    -    rotations    are
+     compounded in matrix for faster computation.
+
+     vmatrix is the matrix for object rotation.  ematrix is  the  matrix  for
+     camera rotation.   if  you want know where a point in space will show up
+     on the screen, load ebx, ecx, ebp with your x,y,z point, subtract camera
+     location and  call erotate (eye rotate).   the  point  will  be  rotated
+     according to current camera angles.  make sure that a call to setsincose
+     has taken place to set the eye rotation matrix (ematrix).
+
+     polygon can handle any number of sides.  to draw a triangle,  make  last
+     point equal  to first point, eg 1,4,5,1. number of sides of a polygon is
+     determined so that the polygon is  not  finished  until  the  last  side
+     equals the first side:  eg 1,7,6,14,13,4,2,1 would be a 7 sided polygon.
+     the constant maxsurfaces determines that maximum number  of  surfaces an
+     object can have.  the constant maxpolys determines the maximum number of
+     connections a surface can have.
+
+     sample shape data:
+
+     thing  dw 6        ; number of points
+            dw 4        ; number of surfaces
+
+            dw x,y,z    ; point 0
+            dw x,y,z    ; point 1
+            dw x,y,z
+            ...
+
+            dw 0,1,2,3,0,  col,com  ;  surface  from  point  0-1,1-2,2-3,3-0,
+                                    colour and command byte
+            dw 2,4,1,2  , col,com ; triangle  from  points  241,  and command
+                                    byte
+            dw 2,7,2    , col,com ; line from 2 to 7
+            dw 6,5,9,13,25,23,1,24,14,29,12,6, col,com ; multi-sided polygon
+            ...
+
+    there are several commands one can use for each surface.   commands  like
+    steel texture, always  visable,  opposite colours, etc.  view the objects
+    include file to see what/how to use them.
+
+    bitmaps can be part of an object or be  made as seperate objects.  i will
+    be using the  bitmaps  for  things like explosions, smoke  (from  damaged
+    planes/spaceships) and distant suns/solar system (u know, like in x-wing)
+    set the values  bitx  and  bity to the scaling to be used for each bitmap
+    and set userotate  to 2 as this is  the  command  to  define  a  bitmaped
+    object.  vxs and  vys  are  the  additional scaling used  for  individual
+    objects (vxs+bitx = final scaling factor).  when part of and object, use
+    dw 32 (bitmap), point #, x scale, y scale.  remember, scaling is added to
+    bitx and bity so objects have a base scale plus some individual scale.
+
+    complex objects don't  cut it for speed! keep your objects simple and you
+    can have more of them on screen at once!  maximum speed is found with low
+    resolutions.  high resolutions with clipped borders also provide adaquate
+    speed.  a shallow but wide screen (small  y, big x) provides better usage
+    of cpu time  than a tall and thin screen.  one big object  is  faster  to
+    compute than many  small  objects (if same surface area) an object viewed
+    from the  side takes signifiganly less  time  to  compute  than if viewed
+    from the top due to the shallow y, large x idea. small  option  has  been
+    added for objects  farther  than  smalldist distance.  object shapes have
+    abcd prefixes.  therefore,  as object  gets  farther  from  camera,  less
+    points/surface must be calculated.  you must define four shapes for every
+    shape.  hi-res shape is a, and lo-res shape is d.
+       eg dd offset athing,offset bthing, offset cthing, offset dthing
+
+    surface data must be entered clockwize so side  will be visible.  counter
+    clockwize surfaces are visable from other side and will  not  be  plotted
+    (unless you use a surface command override, see objects.inc)
+
+    an increase in  screen objects increases cpu time.  however, if you  know
+    that you will always have the screen  filled  (in the case of floors, and
+    runways.) you can disable the clear_fill routine during  those  parts! if
+    the screen will  be  covered  with background walls and such, there is no
+    purpose to call the clear routine  to  compute  the  next  part!   i have
+    therefore added a  flag  for  the clear_fill routine to  use:  when  your
+    animation comes to the part when your looking at the ground or walls (and
+    there are NO  empty  spaces)  toggle  the flag to skip clear_fill and get
+    more  cpu  time.  this also works if  you  are  approaching  an object or
+    large surface, since the new object will totaly cover  the  previous one.
+    another time trick is to have your main background object include the sky
+    (or area to  be cleared) as part of the object.  if you are going to have
+    walls that go  halfway up the screen,  have  them  go  halfway  with  the
+    regular walls and then make another surface that goes to the top of the
+    screen (or above if you want to move around) with the colour  0.  you can
+    then deactivate the  clear_fill  routine  and  still  have  the animation
+    appear as if the walls are completely seperate objects.
+
+    sorting routine for objects (as opposed  to  sides)  uses last z value to
+    re-sort for the  next plot.  if you plan on drawing static  pictures  you
+    may want to  call  makobjs twice to: 1) draw and find zeds, sort, then 2)
+    re-draw. this will be the only way (and  easiest way) to plot an accurate
+    picture of what  we  have.  don't  worry  about  calling   twice   during
+    animations as the  first  picture  will  be  the only picture that is not
+    sorted.  during animations, all objects  are  sorted  properly,  based on
+    previous z.
+
+    routines which are expected to be used in animations have  been optimized
+    but routines intended  for  use as background and title draw routines are
+    not intended to be fast.  if you find  any  areas  that  can be optimized
+    please let me know or send me your changes.  what i really  want  to know
+    is if the  theory  can  be  optimized!   if  i am loosing a cycle here or
+    there, so what.  but if i am loosing  thousands  due  to  lack of initial
+    insight,now i really want to know! if you send me your changes on a disk,
+    i will make  sure  you get your disk back with a tonne  (metric)  of  new
+    assembler routines.
+
+     PLEASE DOCUMENT YOUR CHANGES!!
+
+    newfollow routine does  not  handle  object  lock  on  well  if object is
+    accelerating.  the routine calculates  where  the  object  will  be in di
+    frames and attempts to point the camera to it in di frames.   however, if
+    the object is  accelerating,  then  the  object  will not be where it was
+    expected to be  at that time.  so the  camera  must  re-lock  on  to  its
+    target.  this loop commences until the camera actually  has  locked on to
+    the target object,  from this point on, the camera will follow the object
+    regardless of motion.  the re-lock on  sequence  takes the last number of
+    frames and divides it by two, so the re-lock on loop will move toward the
+    accelerating object at an accelerating rate.
+
+    general overview: locations  are  32 bit -2.1Gig to +2.1Gig,  angles  are
+    16bit from 0-65535 degrees, 4 quadrants - 4096 entries each quadrant.
+
+    variables in vector  routine  are  16bit.  cosine and sine list are words
+    but get converted into doublewords when used.
+
+     some routines: (not all, just some)
+
+     arctan        +/*% arctan(rise/run)=arctan(cx/ax).  any quadrant, 16bit
+     checkfront    +/*% check if points (di,bp) (si,ds) (dx,es) are clockwize
+     clear_fill    +/   clears write page using xupdate and yupdate variables
+     compound      + *% compounds angles  of  eye  and  angles of object into
+                        matrix
+     cosine        +/*% eax=cos(eax), 16bit input, 32bit output
+     erotate       +/*% rotate for angles of eye, 32bit, uses ematrix
+     fakedraw      +/   draw line in firstbyte and lastbyte  tables  from xy1
+                        to xy2
+     flip_page     +/   flip between pages 0 and 1, wait for vertical sync
+     drawvect      +    draw list of vectors using points, sides and order
+     initfont     #     initialize font pointers
+     initpages    #     initialize x-mode pages for flip_page to page 0
+     loadpoints    + *% load points into array, rotate and translate as we go
+     loadsurfs     + *  load surfaces, check if visible as we go
+     look_at_it    +/*   immediatly  force  eyeax,  eyeay  to  look at object
+                        wherelook
+     make1obj      + *  make object si
+     make3d        +/*% make bx,cx,bp into bx,cx 2d pair, 16bit
+     makeobjs      +    make all objects then sorts based on last z location
+     move_to      # /*  move object si to bx,cx,bp - time di frames
+     newfollow    # /*  forces camera to  follow object si, time to get there
+                        di
+     poly_fill     +/   uses oney,firstbyte and lastbyte to draw one surface
+     put_at_top     /   put eax at top of screen in box (for debugging)
+     re_sort       +    sorts objects based on "finalzed" values
+     rotate        +/*% rotate bx,cx,bp (x,y,z) through matrix vrotate, 16bit
+     setmakeorder #     resets order for makeobjs - for initialization
+     setsincose    +/   set sin and cos multipliers for eye rotations
+     setupbase    #     set up object base pointers to shapes
+     sine          +/*% ax=sin(ax), 16bit input, 32bit output
+     sort_list     +    sorts list of sides of polygon
+     updvectors    +/   updates vector xyz's, angles
+
+     legend:
+
+       # used for initialization of code or new scene
+       + used regularly in animation loop
+       / can be used by user outside of animation loop if needed
+       * routine requires parameters passed in registers
+       % routine exits with results in registers
+       > routine wipes harddrive
+
+    there are more routines at the end of 3d.asm for more  general  functions
+    like find the  camera displacement and finding rotational offsets between
+    two objects.  u figure them out - fairly self explanatory.
+
+    divide overflows are generally caused  by  having  an  object  behind the
+    screen (or too close and trying to calculate where it  is  on the screen.
+    obviously this cannot  be  calculated  (since  is it off the screen) when
+    this happens, ztruncate takes over in  make3d  routine.   minz is set  to
+    more than the maximum distance any point on an object  can  be  from  its
+    center of gravity.   use  ztruncate  to truncate underflow of z to higher
+    values to prevent overflows due to  the  object  being  too  wide for the
+    camera.  increasing the zmin value prevents object from  coming too close
+    to the screen.   however,  large  objects  (like  battlecruisers, landing
+    strips) must be  allowed to come close,  as  the  camera  pans  over  the
+    object, in this case, zmin is low but ztruncate takes over  to "warp" the
+    object to an  appropiate  on  screen  location.  ztruncate used in make3d
+    routine does not provide a true rendition  of  what  a  very-close object
+    would look like but it's fast and simple.  generally, these values do not
+    need to be changed unless close objects appear flat or  objects disappear
+    when they become  too  close.   objects  disappear  when they move to the
+    other side of the camera.
+
+    draw_vect routine has a seperate routine for drawing lines (as opposed to
+    surfaces).  the fake_line routine and  poly_fill routine could do the job
+    but they were too slow.  the line was drawn twice then filled just like a
+    polygon but now a seperate routine clipps and draws.   you  will not need
+    to use this  line  drawing routine but if you want, it could be seperated
+    from the draw_vect routine.  I do not  use  the  xmode  line draw by Matt
+    Pritchard as it does not allow for clipping.
+
+    sin and cosin tables - 90 degrees is now 16384, 180=32768...
+
+    move_si routine - to move an object around, load up ebx, ecx and ebp with
+    the x,y,z locations of where you want the object to end up.  load di with
+    the time you would like the object to take to get there. load si with the
+    object number you want to move and call move_si.  the updvectors  routine
+    does the rest!
+
+    to look at  an  object.  either 1) put the object number in wherelook. or
+    2) load si with the object to look at,  load di with the time to move the
+    camera to the object, and call new_follow.
+
+    just think, only  4  months  ago (march '93), i had trouble programming a
+    batch file!
+
+
